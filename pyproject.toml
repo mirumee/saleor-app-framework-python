@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "saleor-app-framework-python"
+version = "0.1.0"
+description = "Saleor app framework"
+authors = [ "Saleor Commerce <hello@saleor.io>" ]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.63.0"
+uvicorn = "^0.13.4"
+Jinja2 = "^2.11.3"
+aiofiles = "^0.6.0"
+aiohttp = "^3.7.4"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.22.0"
+pytest = "^6.2.3"
+isort = "^5.8.0"
+flake8 = "^3.9.1"
+pytest-sugar = "^0.9.4"
+pytest-cov = "^2.11.1"
+pytest-asyncio = "^0.14.0"
+black = "^20.8b1"
+pre-commit = "^2.12.1"
+
+[tool.black]
+target_version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+/(\.git/
+  |\.eggs
+  |\.hg
+  |__pycache__
+  |\.cache
+  |\.ipynb_checkpoints
+  |\.mypy_cache
+  |\.pytest_cache
+  |\.tox
+  |\.venv
+  |node_modules
+  |_build
+  |buck-out
+  |build
+  |dist
+  |media
+  |infrastructure
+  |templates
+  |locale
+  |docs
+)/
+'''
+
+[tool.isort]
+# Vertical Hanging Indent
+multi_line_output = 3
+include_trailing_comma = true
+
+line_length = 88
+known_first_party = ""
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
