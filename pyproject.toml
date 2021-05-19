@@ -2,7 +2,7 @@
 name = "saleor-app-framework-python"
 version = "0.1.0"
 description = "Saleor app framework"
-authors = ["Saleor Commerce hello@saleor.io"]
+authors = [ "Saleor Commerce <hello@saleor.io>" ]
 
 [tool.poetry.dependencies]
 python = "^3.9"
