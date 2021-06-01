@@ -36,7 +36,6 @@ async def install_app(
 ):
     alphabet = string.ascii_letters + string.digits
     secret_key = "".join(secrets.choice(alphabet) for i in range(20))
-    saleor_webhook_id = ""
 
     api_url = get_saleor_api_url(domain)
     executor = get_executor(host=api_url, auth_token=token)
@@ -65,6 +64,7 @@ async def install_app(
         )
         raise InstallAppError("Failed to create webhook for %s", domain)
 
+    saleor_webhook_id = response["data"]["webhookCreate"]["webhook"]["id"]
     install_app_data = InstallAppData(
         token=token, webhook_id=saleor_webhook_id, webhook_secret_key=secret_key
     )

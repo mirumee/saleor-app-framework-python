@@ -1,12 +1,8 @@
-from typing import Awaitable, Callable, List, Optional, Union
+from typing import Any, Awaitable, Callable, List, Optional, Union
 
 from pydantic import BaseModel
 
-from saleor_app_framework.app_framework.schemas.webhooks.model import (
-    PaymentListGatewaysPayload,
-)
-
-Payload = Union[BaseModel, PaymentListGatewaysPayload]
+Payload = Union[BaseModel, Any]
 
 
 class WebhookHandlers(BaseModel):
@@ -43,9 +39,7 @@ class WebhookHandlers(BaseModel):
     page_updated: Optional[Callable[[Payload], Awaitable]] = None
     page_deleted: Optional[Callable[[Payload], Awaitable]] = None
 
-    payment_list_gateways: Optional[
-        Callable[[PaymentListGatewaysPayload], Awaitable]
-    ] = None
+    payment_list_gateways: Optional[Callable[[Payload], Awaitable]] = None
 
     def get(self, event_name) -> Optional[Callable[[BaseModel], Awaitable]]:
         return self.__dict__.get(event_name)
