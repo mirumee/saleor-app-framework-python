@@ -1,34 +1,34 @@
-from typing import Awaitable, Callable
+from typing import Any, Awaitable, Callable, List
 
 from fastapi import APIRouter, Depends
-from fastapi.requests import Request
 
-from ..schemas.core import DomainName
-from .deps import saleor_domain_header, verify_saleor_domain
+from ..core.types import DomainName
+from ..schemas.webhooks.handlers import WebhookHandlers
+from .deps import verify_saleor_domain, webhook_event_type
 
 
-# TODO Finish the view
 def initialize_webhook_router(
     validate_domain: Callable[[DomainName], Awaitable[bool]],
+    webhook_handlers: WebhookHandlers,
 ):
     router = APIRouter(
-        prefix="/webhook"
-    )  # responses={400: {"description": "Missing required header"}})
+        prefix="/webhook",
+        responses={
+            400: {"description": "Missing required header"},
+            404: {"description": "Incorrect saleor event"},
+        },
+    )
 
-    @router.post("/")
-    async def handle_webhook():
-        ...
-
-    @router.post("/register")
-    async def register_webhook(
-        request: Request,
-        # register_data: WebhookRegister,
+    @router.post("/", name="handle-webhook")
+    async def handle_webhook(
+        payload: List[Any],  # FIXME provide a way to proper define payload types
         _domain_is_valid=Depends(verify_saleor_domain(validate_domain)),
-        saleor_domain=Depends(saleor_domain_header),
+        event_type=Depends(webhook_event_type),
     ):
-        # TODO to be implemented in separate PR
-
-        # webhook_url = request.url_for("handle_webhook")
-        return {}
+        response = {}
+        handler = webhook_handlers.get(event_type)
+        if handler is not None:
+            response = await handler(payload)
+        return response or {}
 
     return router

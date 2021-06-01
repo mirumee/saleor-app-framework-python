@@ -5,7 +5,8 @@ from aiohttp import ClientError, ClientSession
 
 from .conf import settings
 
-REQUEST_TIMEOUT = 3
+DEFAULT_REQUEST_TIMEOUT = 10
+
 logger = logging.getLogger("graphql")
 
 
@@ -22,14 +23,14 @@ def get_saleor_api_url(domain: str) -> str:
     return f"{url}/graphql/"
 
 
-def get_executor(host, auth_token=None):
+def get_executor(host, auth_token=None, timeout=DEFAULT_REQUEST_TIMEOUT):
     async def _execute(query, variables=None):
-        return await _execute_query(host, auth_token, query, variables)
+        return await _execute_query(host, auth_token, timeout, query, variables)
 
     return _execute
 
 
-async def _execute_query(host, api_key, query, variables=None, file=None):
+async def _execute_query(host, api_key, timeout, query, variables=None, file=None):
     headers = {"Authorization": "Bearer " + api_key} if api_key else {}
 
     if not file:
@@ -52,15 +53,15 @@ async def _execute_query(host, api_key, query, variables=None, file=None):
                 url=host,
                 json=data,
                 headers=headers,
-                timeout=REQUEST_TIMEOUT,
+                timeout=timeout,
                 **kwargs,
             )
-            result = await response.json()
         except ClientError as e:
             logger.exception(msg="Connection error", exc_info=e)
             raise GraphqlError(e)
 
     try:
+        result = await response.json()
         if result.get("errors"):
             logger.error("Query to the server has returned an error.", extra=result)
     except json.JSONDecodeError as e:

@@ -1,17 +1,16 @@
 from typing import Awaitable, Callable
 
 from fastapi import APIRouter
-from fastapi.staticfiles import StaticFiles
 
-from .core.conf import settings
+from .core.types import DomainName, InstallAppData
 from .endpoints import configuration, manifest, webhook
 from .schemas.core import (
     ConfigurationData,
     ConfigurationDataClass,
     ConfigurationDataUpdate,
     ConfigurationDataUpdateClass,
-    DomainName,
 )
+from .schemas.webhooks.handlers import WebhookHandlers
 
 
 def initialize_router(
@@ -23,6 +22,8 @@ def initialize_router(
     ],
     validate_domain: Callable[[DomainName], Awaitable[bool]],
     configuration_template: str,
+    save_app_data: Callable[[DomainName, InstallAppData], Awaitable],
+    webhook_handlers: WebhookHandlers,
 ) -> APIRouter:
     router = APIRouter()
 
@@ -36,11 +37,14 @@ def initialize_router(
             update_configuration,
             validate_domain,
             configuration_template,
+            save_app_data,
+            webhook_handlers.get_assigned_events(),
         )
     )
 
     router.include_router(configuration_router)
-    router.include_router(webhook.initialize_webhook_router(validate_domain))
-    router.mount("/static", StaticFiles(directory=settings.STATIC_DIR), name="static")
+    router.include_router(
+        webhook.initialize_webhook_router(validate_domain, webhook_handlers)
+    )
 
     return router

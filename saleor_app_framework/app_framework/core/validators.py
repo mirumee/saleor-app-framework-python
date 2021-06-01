@@ -21,7 +21,6 @@ async def verify_token(saleor_domain: str, token: str) -> bool:
             "token": token,
         },
     )
-
     try:
         return response["data"]["tokenVerify"]["isValid"] is True
     except KeyError:
