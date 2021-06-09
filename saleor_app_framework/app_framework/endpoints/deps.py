@@ -1,10 +1,12 @@
+import hashlib
+import hmac
 import logging
 from typing import Awaitable, Callable
 
-from fastapi import Depends, Header, HTTPException
+from fastapi import Depends, Header, HTTPException, Request
 
 from ..core.conf import settings
-from ..core.types import DomainName
+from ..core.types import DomainName, WebhookData
 from ..core.validators import verify_token
 from ..schemas.webhooks.handlers import WebhookHandlers
 
@@ -94,3 +96,29 @@ async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> s
             ),
         )
     return event
+
+
+def verify_webhook_signature(
+    get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]]
+):
+    async def fun(
+        request: Request,
+        signature=Header(None, alias=SALEOR_SIGNATURE_HEADER),
+        domain_name=Depends(saleor_domain_header),
+    ) -> bool:
+        webhook_details = await get_webhook_details(domain_name)
+        content = await request.body()
+        signature_bytes = bytes(signature, "utf-8")
+        secret_key_bytes = bytes(webhook_details.webhook_secret_key, "utf-8")
+
+        content_signature_str = hmac.new(
+            secret_key_bytes, content, hashlib.sha256
+        ).hexdigest()
+        content_signature = bytes(content_signature_str, "utf-8")
+        if not hmac.compare_digest(content_signature, signature_bytes):
+            raise HTTPException(
+                status_code=401,
+                detail=(f"Invalid webhook signature for {SALEOR_SIGNATURE_HEADER}"),
+            )
+
+    return fun

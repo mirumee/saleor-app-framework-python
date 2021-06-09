@@ -2,7 +2,7 @@ from typing import Awaitable, Callable
 
 from fastapi import APIRouter
 
-from .core.types import DomainName, InstallAppData
+from .core.types import DomainName, WebhookData
 from .endpoints import configuration, manifest, webhook
 from .schemas.core import (
     ConfigurationData,
@@ -22,8 +22,9 @@ def initialize_router(
     ],
     validate_domain: Callable[[DomainName], Awaitable[bool]],
     configuration_template: str,
-    save_app_data: Callable[[DomainName, InstallAppData], Awaitable],
+    save_app_data: Callable[[DomainName, WebhookData], Awaitable],
     webhook_handlers: WebhookHandlers,
+    get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
 ) -> APIRouter:
     router = APIRouter()
 
@@ -44,7 +45,9 @@ def initialize_router(
 
     router.include_router(configuration_router)
     router.include_router(
-        webhook.initialize_webhook_router(validate_domain, webhook_handlers)
+        webhook.initialize_webhook_router(
+            validate_domain, get_webhook_details, webhook_handlers
+        )
     )
 
     return router

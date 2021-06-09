@@ -5,7 +5,7 @@ AppToken = str
 Url = str
 
 
-class InstallAppData(BaseModel):
+class WebhookData(BaseModel):
     token: str
     webhook_id: str
     webhook_secret_key: str

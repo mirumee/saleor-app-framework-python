@@ -10,7 +10,7 @@ from ..core.conf import settings
 from ..core.errors import InstallAppError
 from ..core.graphql import GraphqlError
 from ..core.install import install_app
-from ..core.types import DomainName, InstallAppData
+from ..core.types import DomainName, WebhookData
 from ..schemas.core import (
     ConfigurationData,
     ConfigurationDataClass,
@@ -35,7 +35,7 @@ def initialize_configuration_router(
     ],
     validate_domain: Callable[[DomainName], Awaitable[bool]],
     configuration_template: str,
-    save_app_data: Callable[[DomainName, InstallAppData], Awaitable],
+    save_app_data: Callable[[DomainName, WebhookData], Awaitable],
     webhook_events: List[str],
 ):
     router = APIRouter(responses={400: {"description": "Missing required header"}})

@@ -6,7 +6,7 @@ from typing import Awaitable, Callable, List
 from ..core.conf import settings
 from .errors import InstallAppError
 from .graphql import GraphqlError, get_executor, get_saleor_api_url
-from .types import AppToken, DomainName, InstallAppData, Url
+from .types import AppToken, DomainName, Url, WebhookData
 
 logger = logging.getLogger(__file__)
 
@@ -32,7 +32,7 @@ async def install_app(
     token: AppToken,
     events: List[str],
     target_url: Url,
-    save_app_data: Callable[[DomainName, InstallAppData], Awaitable],
+    save_app_data: Callable[[DomainName, WebhookData], Awaitable],
 ):
     alphabet = string.ascii_letters + string.digits
     secret_key = "".join(secrets.choice(alphabet) for i in range(20))
@@ -65,7 +65,7 @@ async def install_app(
         raise InstallAppError("Failed to create webhook for %s", domain)
 
     saleor_webhook_id = response["data"]["webhookCreate"]["webhook"]["id"]
-    install_app_data = InstallAppData(
+    install_app_data = WebhookData(
         token=token, webhook_id=saleor_webhook_id, webhook_secret_key=secret_key
     )
     await save_app_data(domain, install_app_data)
