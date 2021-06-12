@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get(
     "/manifest",
     response_model=Manifest,
-    responses={502: {"description": "Manifest not found"}},
+    responses={502: {"description": "Manifest not found."}},
 )
 async def manifest(
     request: Request,

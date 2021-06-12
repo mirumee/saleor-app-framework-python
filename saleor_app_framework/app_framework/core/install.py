@@ -12,18 +12,19 @@ logger = logging.getLogger(__file__)
 
 
 CREATE_WEBHOOK = """
-mutation WebhookCreate($input: WebhookCreateInput!){
-    webhookCreate(input: $input){
-        webhookErrors{
-         field
-         message
-         code
-       }
-       webhook {
-             id
-       }
-   }
+mutation WebhookCreate($input: WebhookCreateInput!) {
+  webhookCreate(input: $input) {
+    webhookErrors {
+      field
+      message
+      code
+    }
+    webhook {
+      id
+    }
+  }
 }
+
 """
 
 
@@ -53,7 +54,7 @@ async def install_app(
     )
 
     if response.get("errors"):
-        raise GraphqlError("Webhook create mutation raised an error")
+        raise GraphqlError("Webhook create mutation raised an error.")
 
     webhook_error = response["data"].get("webhookErrors")
     if webhook_error:
@@ -62,7 +63,7 @@ async def install_app(
             domain,
             webhook_error,
         )
-        raise InstallAppError("Failed to create webhook for %s", domain)
+        raise InstallAppError("Failed to create webhook for %s.", domain)
 
     saleor_webhook_id = response["data"]["webhookCreate"]["webhook"]["id"]
     install_app_data = WebhookData(

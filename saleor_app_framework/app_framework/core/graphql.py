@@ -17,7 +17,7 @@ class GraphqlError(Exception):
 def get_saleor_api_url(domain: str) -> str:
     protocol = "https"
     if settings.DEBUG:
-        logger.warning("Using non secured protocol")
+        logger.warning("Using non secured protocol.")
         protocol = "http"
     url = f"{protocol}://{domain}"
     return f"{url}/graphql/"

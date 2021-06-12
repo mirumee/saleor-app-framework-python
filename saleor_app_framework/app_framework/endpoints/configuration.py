@@ -38,7 +38,7 @@ def initialize_configuration_router(
     save_app_data: Callable[[DomainName, WebhookData], Awaitable],
     webhook_events: List[str],
 ):
-    router = APIRouter(responses={400: {"description": "Missing required header"}})
+    router = APIRouter(responses={400: {"description": "Missing required header."}})
 
     @router.get("/", response_class=HTMLResponse, name="configuration-form")
     async def get_form(
@@ -76,8 +76,8 @@ def initialize_configuration_router(
     @router.post(
         "/install",
         responses={
-            400: {"description": "Missing required header"},
-            403: {"description": "Incorrect token or not enough permissions"},
+            400: {"description": "Missing required header."},
+            403: {"description": "Incorrect token or not enough permissions."},
         },
         name="app-install",
     )
@@ -97,7 +97,7 @@ def initialize_configuration_router(
             )
         except (InstallAppError, GraphqlError):
             raise HTTPException(
-                status_code=403, detail="Incorrect token or not enough permissions"
+                status_code=403, detail="Incorrect token or not enough permissions."
             )
 
         return {}

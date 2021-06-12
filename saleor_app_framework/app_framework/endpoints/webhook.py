@@ -15,9 +15,9 @@ def initialize_webhook_router(
     router = APIRouter(
         prefix="/webhook",
         responses={
-            400: {"description": "Missing required header"},
-            401: {"description": "Incorrect signature"},
-            404: {"description": "Incorrect saleor event"},
+            400: {"description": "Missing required header."},
+            401: {"description": "Incorrect signature."},
+            404: {"description": "Incorrect saleor event."},
         },
     )
 

@@ -24,9 +24,9 @@ async def saleor_domain_header(
     if settings.DEBUG:
         saleor_domain = saleor_domain or settings.DEV_SALEOR_DOMAIN
     if not saleor_domain:
-        logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header")
+        logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header.")
         raise HTTPException(
-            status_code=400, detail=f"Missing {SALEOR_DOMAIN_HEADER.upper()} header"
+            status_code=400, detail=f"Missing {SALEOR_DOMAIN_HEADER.upper()} header."
         )
     return saleor_domain
 
@@ -35,9 +35,9 @@ async def saleor_token(token=Header(None, alias=SALEOR_TOKEN_HEADER)) -> str:
     if settings.DEBUG:
         token = token or settings.DEV_SALEOR_TOKEN
     if not token:
-        logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header")
+        logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(
-            status_code=400, detail=f"Missing {SALEOR_TOKEN_HEADER.upper()} header"
+            status_code=400, detail=f"Missing {SALEOR_TOKEN_HEADER.upper()} header."
         )
     return token
 
@@ -84,7 +84,7 @@ async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> s
         )
     if event not in WebhookHandlers.__fields__:
         logger.error(
-            "Event from %s header %s doesn't have own handler",
+            "Event from %s header %s doesn't have own handler.",
             SALEOR_EVENT_HEADER,
             event,
         )
