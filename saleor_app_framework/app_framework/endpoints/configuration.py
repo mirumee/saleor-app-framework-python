@@ -6,7 +6,7 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from ..core.conf import settings
+from ..core.conf import Settings, get_settings
 from ..core.errors import InstallAppError
 from ..core.graphql import GraphqlError
 from ..core.install import install_app
@@ -45,6 +45,7 @@ def initialize_configuration_router(
         request: Request,
         saleor_domain=Depends(saleor_domain_header),
         token=Depends(saleor_token),
+        settings: Settings = Depends(get_settings),
     ):
         context = {
             "request": request,
@@ -52,7 +53,7 @@ def initialize_configuration_router(
             "domain": saleor_domain,
             "token": token,
         }
-        return Jinja2Templates(directory=settings.STATIC_DIR).TemplateResponse(
+        return Jinja2Templates(directory=settings.static_dir).TemplateResponse(
             configuration_template, context
         )
 
