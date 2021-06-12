@@ -10,6 +10,7 @@ router = APIRouter()
 @router.get(
     "/manifest",
     response_model=Manifest,
+    # FIXME validate manifest in runtime
     responses={502: {"description": "Manifest not found."}},
 )
 async def manifest(

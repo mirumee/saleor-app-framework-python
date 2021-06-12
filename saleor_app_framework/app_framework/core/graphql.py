@@ -4,14 +4,11 @@ import logging
 from aiohttp import ClientError, ClientSession
 
 from .conf import settings
+from .errors import GraphQLError
 
 DEFAULT_REQUEST_TIMEOUT = 10
 
 logger = logging.getLogger("graphql")
-
-
-class GraphqlError(Exception):
-    pass
 
 
 def get_saleor_api_url(domain: str) -> str:
@@ -58,13 +55,15 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
             )
         except ClientError as e:
             logger.exception(msg="Connection error", exc_info=e)
-            raise GraphqlError(e)
+            raise GraphQLError(e)
 
     try:
+
         result = await response.json()
-        if result.get("errors"):
-            logger.error("Query to the server has returned an error.", extra=result)
+        errors = result.get("errors")
+        if errors:
+            logger.warning("Query to the server has returned an error.", extra=errors)
     except json.JSONDecodeError as e:
         logger.exception(msg=f"FAILED RESPONSE: {response}", exc_info=e)
-        raise GraphqlError(e)
-    return result
+        raise GraphQLError(e)
+    return result, errors

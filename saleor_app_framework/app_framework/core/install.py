@@ -6,26 +6,10 @@ from typing import Awaitable, Callable, List
 from ..core.conf import settings
 from .errors import InstallAppError
 from .graphql import GraphqlError, get_executor, get_saleor_api_url
+from .mutations import CREATE_WEBHOOK
 from .types import AppToken, DomainName, Url, WebhookData
 
 logger = logging.getLogger(__file__)
-
-
-CREATE_WEBHOOK = """
-mutation WebhookCreate($input: WebhookCreateInput!) {
-  webhookCreate(input: $input) {
-    webhookErrors {
-      field
-      message
-      code
-    }
-    webhook {
-      id
-    }
-  }
-}
-
-"""
 
 
 async def install_app(
@@ -41,7 +25,7 @@ async def install_app(
     api_url = get_saleor_api_url(domain)
     executor = get_executor(host=api_url, auth_token=token)
 
-    response = await executor(
+    response, errors = await executor(
         CREATE_WEBHOOK,
         variables={
             "input": {
@@ -53,7 +37,7 @@ async def install_app(
         },
     )
 
-    if response.get("errors"):
+    if errors:
         raise GraphqlError("Webhook create mutation raised an error.")
 
     webhook_error = response["data"].get("webhookErrors")
