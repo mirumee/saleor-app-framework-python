@@ -11,8 +11,8 @@ def get_app_manifest():
     settings = get_settings()
     if MANIFEST is not None:
         return MANIFEST
-    if not os.path.exists(settings.manigest_path):
+    if not os.path.exists(settings.manifest_path):
         return None
-    with open(settings.manigest_path, mode="r") as f:
+    with open(settings.manifest_path, mode="r") as f:
         MANIFEST = json.load(f)
     return MANIFEST

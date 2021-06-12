@@ -15,10 +15,10 @@ PROJECT_DIR = os.path.dirname(__file__)
 
 class Settings(BaseSettings):
     app_name: str = "App"
-    project_dir: str = PROJECT_DIR
-    static_dir: str = os.path.join(PROJECT_DIR, "static")
-    templates_dir: str = os.path.join(PROJECT_DIR, "templates")
-    manigest_path: str = os.path.join(PROJECT_DIR, "manifest.json")
+    project_dir: str
+    static_dir: str
+    templates_dir: str
+    manifest_path: str
     debug: bool = True
     dev_saleor_domain: Optional[str] = None
     dev_saleor_token: Optional[str] = None
@@ -49,11 +49,11 @@ def import_string(dotted_path):
 def get_settings() -> Settings:
     settings_path = os.environ.get(SETTINGS_ENV_VARIABLE)
     if not settings_path:
-        logger.warning(
-            f"{SETTINGS_ENV_VARIABLE} was not provided. Using default settings."
+        raise Exception(
+            f"Env {SETTINGS_ENV_VARIABLE} was not provided. Provide python path to "
+            f"project's settings class."
         )
-        return Settings()
     settings = import_string(settings_path)()
     if not isinstance(settings, Settings):
-        logger.warning("Incorrect type of settings object")
+        logger.warning("Incorrect type of settings object.")
     return settings
