@@ -5,7 +5,7 @@ from typing import Awaitable, Callable
 
 from fastapi import Depends, Header, HTTPException, Request
 
-from ..core.conf import settings
+from ..core.conf import Settings, get_settings
 from ..core.types import DomainName, WebhookData
 from ..core.validators import verify_token
 from ..schemas.webhooks.handlers import WebhookHandlers
@@ -19,10 +19,11 @@ SALEOR_SIGNATURE_HEADER = "x-saleor-signature"
 
 
 async def saleor_domain_header(
-    saleor_domain=Header(None, alias=SALEOR_DOMAIN_HEADER)
+    saleor_domain=Header(None, alias=SALEOR_DOMAIN_HEADER),
+    settings: Settings = Depends(get_settings),
 ) -> DomainName:
-    if settings.DEBUG:
-        saleor_domain = saleor_domain or settings.DEV_SALEOR_DOMAIN
+    if settings.debug:
+        saleor_domain = saleor_domain or settings.dev_saleor_domain
     if not saleor_domain:
         logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header.")
         raise HTTPException(
@@ -31,9 +32,12 @@ async def saleor_domain_header(
     return saleor_domain
 
 
-async def saleor_token(token=Header(None, alias=SALEOR_TOKEN_HEADER)) -> str:
-    if settings.DEBUG:
-        token = token or settings.DEV_SALEOR_TOKEN
+async def saleor_token(
+    token=Header(None, alias=SALEOR_TOKEN_HEADER),
+    settings: Settings = Depends(get_settings),
+) -> str:
+    if settings.debug:
+        token = token or settings.dev_saleor_token
     if not token:
         logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(

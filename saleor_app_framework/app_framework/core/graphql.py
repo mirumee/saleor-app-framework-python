@@ -3,8 +3,8 @@ import logging
 
 from aiohttp import ClientError, ClientSession
 
-from .conf import settings
 from .errors import GraphQLError
+from .conf import get_settings
 
 DEFAULT_REQUEST_TIMEOUT = 10
 
@@ -13,8 +13,9 @@ logger = logging.getLogger("graphql")
 
 def get_saleor_api_url(domain: str) -> str:
     protocol = "https"
-    if settings.DEBUG:
-        logger.warning("Using non secured protocol.")
+    settings = get_settings()
+    if settings.debug:
+        logger.warning("Using non secured protocol")
         protocol = "http"
     url = f"{protocol}://{domain}"
     return f"{url}/graphql/"
