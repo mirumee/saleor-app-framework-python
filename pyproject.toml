@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "saleor-app-framework-python"
+name = "saleor-app-framework"
 version = "0.1.0"
 description = "Saleor app framework"
 authors = [ "Saleor Commerce <hello@saleor.io>" ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-fastapi = "^0.63.0"
-uvicorn = "^0.13.4"
+python = "^3.8"
+fastapi = "^0.65.2"
+uvicorn = "^0.14.0"
 Jinja2 = "^2.11.3"
 aiofiles = "^0.6.0"
 aiohttp = "^3.7.4"
@@ -22,6 +22,8 @@ pytest-cov = "^2.11.1"
 pytest-asyncio = "^0.14.0"
 black = "^20.8b1"
 pre-commit = "^2.12.1"
+tox = "^3.23.1"
+tox-poetry = "^0.4.0"
 
 [tool.black]
 target_version = ['py38']
@@ -61,3 +63,38 @@ known_first_party = ""
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py38, py39, lint, coverage
+
+[testenv]
+description = run the test driver with {basepython}
+deps = .[develop]
+commands =
+    pytest saleor_app_framework
+
+[testenv:lint]
+description = check the code style
+basepython = python3.9
+commands = 
+    black --diff --check saleor_app_framework
+    isort -c -rc --diff saleor_app_framework
+    flake8 saleor_app_framework
+
+[testenv:coverage]
+description = [run locally after tests]: combine coverage data and create report
+deps = 
+    coverage
+skip_install = True
+commands =
+    coverage erase
+    coverage run --source="saleor_app_framework" -p -m pytest saleor_app_framework
+    coverage combine
+    coverage report --fail-under=90
+depends =
+    py38,
+    py39,
+parallel_show_output = True
+"""
