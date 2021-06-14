@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from ..core.conf import settings
 from ..core.errors import InstallAppError
-from ..core.graphql import GraphqlError
+from ..core.graphql import GraphQLError
 from ..core.install import install_app
 from ..core.types import DomainName, WebhookData
 from ..schemas.core import (
@@ -95,7 +95,7 @@ def initialize_configuration_router(
             await install_app(
                 domain, auth_token, webhook_events, target_url, save_app_data
             )
-        except (InstallAppError, GraphqlError):
+        except (InstallAppError, GraphQLError):
             raise HTTPException(
                 status_code=403, detail="Incorrect token or not enough permissions."
             )

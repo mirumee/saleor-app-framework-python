@@ -5,7 +5,7 @@ from typing import Awaitable, Callable, List
 
 from ..core.conf import settings
 from .errors import InstallAppError
-from .graphql import GraphqlError, get_executor, get_saleor_api_url
+from .graphql import GraphQLError, get_executor, get_saleor_api_url
 from .mutations import CREATE_WEBHOOK
 from .types import AppToken, DomainName, Url, WebhookData
 
@@ -38,7 +38,7 @@ async def install_app(
     )
 
     if errors:
-        raise GraphqlError("Webhook create mutation raised an error.")
+        raise GraphQLError("Webhook create mutation raised an error.")
 
     webhook_error = response["data"].get("webhookErrors")
     if webhook_error:
