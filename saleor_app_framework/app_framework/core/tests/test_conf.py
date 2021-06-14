@@ -5,16 +5,15 @@ import pytest
 
 from ..conf import SETTINGS_ENV_VARIABLE, Settings, get_settings
 
+settings = Settings.construct(
+    app_name="TMP app",
+    project_dir=".",
+    manifest_path="/path",
+    static_dir="static",
+    templates_dir="templates",
+)
 
-class TmpSettings(Settings):
-    app_name = "TMP app"
-    manifest_path = ""
-    static_dir = ""
-    templates_dir = ""
-    project_dir = ""
-
-
-APP_SETTINGS = "saleor_app_framework.app_framework.core.tests.test_conf.TmpSettings"
+APP_SETTINGS = "saleor_app_framework.app_framework.core.tests.test_conf.settings"
 
 
 @pytest.fixture(autouse=True)
@@ -36,5 +35,5 @@ def test_get_settings_raises_error_when_incorrect_path():
 def test_get_settings():
     with patch.dict(os.environ, {SETTINGS_ENV_VARIABLE: APP_SETTINGS}):
         settings = get_settings()
-    assert isinstance(settings, TmpSettings)
+    assert isinstance(settings, Settings)
     assert settings.app_name == "TMP app"

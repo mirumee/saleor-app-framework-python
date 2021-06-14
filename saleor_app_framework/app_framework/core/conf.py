@@ -4,7 +4,7 @@ import os
 from functools import lru_cache
 from typing import Optional
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, DirectoryPath, FilePath
 
 SETTINGS_ENV_VARIABLE = "APP_SETTINGS"
 
@@ -15,10 +15,10 @@ PROJECT_DIR = os.path.dirname(__file__)
 
 class Settings(BaseSettings):
     app_name: str = "App"
-    project_dir: str
-    static_dir: str
-    templates_dir: str
-    manifest_path: str
+    project_dir: DirectoryPath
+    static_dir: DirectoryPath
+    templates_dir: DirectoryPath
+    manifest_path: FilePath
     debug: bool = True
     dev_saleor_domain: Optional[str] = None
     dev_saleor_token: Optional[str] = None
@@ -53,7 +53,7 @@ def get_settings() -> Settings:
             f"Env {SETTINGS_ENV_VARIABLE} was not provided. Provide python path to "
             f"project's settings class."
         )
-    settings = import_string(settings_path)()
+    settings = import_string(settings_path)
     if not isinstance(settings, Settings):
         logger.warning("Incorrect type of settings object.")
     return settings
