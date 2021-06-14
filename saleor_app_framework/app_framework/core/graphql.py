@@ -58,7 +58,6 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
             raise GraphQLError(e)
 
     try:
-
         result = await response.json()
         errors = result.get("errors")
         if errors:

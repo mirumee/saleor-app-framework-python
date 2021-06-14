@@ -13,9 +13,7 @@ router = APIRouter()
     # FIXME validate manifest in runtime
     responses={502: {"description": "Manifest not found."}},
 )
-async def manifest(
-    request: Request,
-):
+async def manifest(request: Request):
     token_target_url = request.url_for("app-install")
     configuration_form_url = request.url_for("configuration-form")
     # TODO Move manifest fields to settings variables
