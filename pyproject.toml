@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "saleor-app-framework"
+name = "saleor-app"
 version = "0.1.0"
 description = "Saleor app framework"
 authors = [ "Saleor Commerce <hello@saleor.io>" ]
@@ -24,6 +24,7 @@ black = "^20.8b1"
 pre-commit = "^2.12.1"
 tox = "^3.23.1"
 tox-poetry = "^0.4.0"
+ipdb = "^0.13.9"
 
 [tool.black]
 target_version = ['py38']
@@ -73,15 +74,15 @@ envlist = py38, py39, lint, coverage
 description = run the test driver with {basepython}
 deps = .[develop]
 commands =
-    pytest saleor_app_framework
+    pytest src/saleor_app
 
 [testenv:lint]
 description = check the code style
 basepython = python3.9
 commands = 
-    black --diff --check saleor_app_framework
-    isort -c -rc --diff saleor_app_framework
-    flake8 saleor_app_framework
+    black --diff --check src/saleor_app
+    isort -c -rc --diff src/saleor_app
+    flake8 src/saleor_app
 
 [testenv:coverage]
 description = [run locally after tests]: combine coverage data and create report
@@ -90,7 +91,7 @@ deps =
 skip_install = True
 commands =
     coverage erase
-    coverage run --source="saleor_app_framework" -p -m pytest saleor_app_framework
+    coverage run --source="saleor_app" -p -m pytest src/saleor_app
     coverage combine
     coverage report --fail-under=90
 depends =

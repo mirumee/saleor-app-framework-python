@@ -3,7 +3,7 @@ import logging
 
 from aiohttp import ClientError, ClientSession
 
-from .conf import get_settings
+from saleor_app.conf import get_settings
 
 DEFAULT_REQUEST_TIMEOUT = 10
 

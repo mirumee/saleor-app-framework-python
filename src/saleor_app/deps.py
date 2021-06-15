@@ -5,10 +5,10 @@ from typing import Awaitable, Callable
 
 from fastapi import Depends, Header, HTTPException, Request
 
-from ..core.conf import Settings, get_settings
-from ..core.types import DomainName, WebhookData
-from ..core.validators import verify_token
-from ..schemas.webhooks.handlers import WebhookHandlers
+from saleor_app.conf import Settings, get_settings
+from saleor_app.schemas.core import DomainName
+from saleor_app.schemas.handlers import WebhookHandlers
+from saleor_app.validators import verify_token
 
 logger = logging.getLogger(__file__)
 
@@ -66,10 +66,13 @@ async def verify_saleor_token(
 
 
 def verify_saleor_domain(
-    validate_domain: Callable[[DomainName], Awaitable[bool]]
+    # validate_domain: Callable[[DomainName], Awaitable[bool]],
+    request: Request,
 ) -> Callable[[], Awaitable[bool]]:
     async def fun(saleor_domain=Depends(saleor_domain_header)) -> bool:
-        domain_is_valid = await validate_domain(saleor_domain)
+        domain_is_valid = await request.app.extra["saleor"]["validate_domain"](
+            saleor_domain
+        )
         if not domain_is_valid:
             logger.warning(f"Provided domain {saleor_domain} is invalid.")
             raise HTTPException(
@@ -102,15 +105,15 @@ async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> s
     return event
 
 
-def verify_webhook_signature(
-    get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]]
-):
+def verify_webhook_signature():
     async def fun(
         request: Request,
         signature=Header(None, alias=SALEOR_SIGNATURE_HEADER),
         domain_name=Depends(saleor_domain_header),
     ) -> bool:
-        webhook_details = await get_webhook_details(domain_name)
+        webhook_details = await request.app.extra["saleor"]["get_webhook_details"](
+            domain_name
+        )
         content = await request.body()
         signature_bytes = bytes(signature, "utf-8")
         secret_key_bytes = bytes(webhook_details.webhook_secret_key, "utf-8")
@@ -126,3 +129,29 @@ def verify_webhook_signature(
             )
 
     return fun
+
+
+class ConfigurationFormDeps:
+    def __init__(
+        self,
+        request: Request,
+        saleor_domain=Depends(saleor_domain_header),
+        token=Depends(saleor_token),
+        settings: Settings = Depends(get_settings),
+    ):
+        self.request = request
+        self.saleor_domain = saleor_domain
+        self.token = token
+        self.settings = settings
+
+
+class ConfigurationDataDeps:
+    def __init__(
+        self,
+        request: Request,
+        saleor_domain=Depends(saleor_domain_header),
+        _domain_is_valid=Depends(verify_saleor_domain),
+        _token_is_valid=Depends(verify_saleor_token),
+    ):
+        self.request = request
+        self.saleor_domain = saleor_domain

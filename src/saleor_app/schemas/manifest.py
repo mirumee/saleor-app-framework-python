@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class Manifest(BaseModel):
+class SettingsManifest(BaseModel):
     name: str
     version: str
     about: str
@@ -11,8 +11,11 @@ class Manifest(BaseModel):
     dataPrivacyUrl: str
     homepageUrl: str
     supportUrl: str
-    configurationUrl: str
-    appUrl: str
-    tokenTargetUrl: str
     id: str
     permissions: List[str]
+    appUrl: str
+
+
+class Manifest(SettingsManifest):
+    configurationUrl: str
+    tokenTargetUrl: str

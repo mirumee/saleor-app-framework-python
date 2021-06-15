@@ -3,10 +3,10 @@ import secrets
 import string
 from typing import Awaitable, Callable, List
 
-from ..core.conf import get_settings
-from .errors import InstallAppError
-from .graphql import GraphqlError, get_executor, get_saleor_api_url
-from .types import AppToken, DomainName, Url, WebhookData
+from saleor_app.conf import get_settings
+from saleor_app.errors import InstallAppError
+from saleor_app.graphql import GraphqlError, get_executor, get_saleor_api_url
+from saleor_app.schemas.core import AppToken, DomainName, Url, WebhookData
 
 logger = logging.getLogger(__file__)
 

@@ -1,4 +1,4 @@
-from .graphql import get_executor, get_saleor_api_url
+from saleor_app.graphql import get_executor, get_saleor_api_url
 
 VERIFY_TOKEN = """
 mutation TokenVerify($token: String!) {
