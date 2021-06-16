@@ -9,9 +9,10 @@ from starlette.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
 
-from saleor_app.app import SaleorFastAPIApp
+from saleor_app.app import SaleorApp
 from saleor_app.conf import Settings
 from saleor_app.deps import ConfigurationFormDeps, ConfigurationDataDeps
+from saleor_app.endpoints import get_form
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.manifest import SettingsManifest
@@ -85,25 +86,13 @@ webhook_handlers = WebhookHandlers(
 )
 
 
-app = SaleorFastAPIApp(
+app = SaleorApp(
     validate_domain=validate_domain,
     save_app_data=store_app_data,
     webhook_handlers=webhook_handlers,
     get_webhook_details=get_webhook_details,
 )
-
-
-@app.configuration_router.get("/", response_class=HTMLResponse, name="configuration-form")
-async def get_form(commons: ConfigurationFormDeps = Depends()):
-    context = {
-        "request": commons.request,
-        "form_url": commons.request.url,
-        "domain": commons.saleor_domain,
-        "token": commons.token,
-    }
-    return Jinja2Templates(directory=commons.settings.static_dir).TemplateResponse(
-        "configuration/index.html", context
-    )
+app.configuration_router.get("/", response_class=HTMLResponse, name="configuration-form")(get_form)
 
 
 @app.configuration_router.get("/data")
@@ -112,6 +101,8 @@ async def get_configuration_data(commons: ConfigurationDataDeps = Depends()):
 
 
 app.include_saleor_app_routes()
+
+
 app.add_middleware(CORSMiddleware,
         allow_origins=["*"],
         allow_headers=["*"],
@@ -121,5 +112,5 @@ app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
 
 if __name__ == "__main__":
-    os.environ["APP_SETTINGS"] = "samples.simple_app.app.settings"
-    uvicorn.run("samples.simple_app.app:app", host="0.0.0.0", port=5000, debug=True, reload=True)
+    os.environ["APP_SETTINGS"] = "app.settings"
+    uvicorn.run("app:app", host="0.0.0.0", port=5000, debug=True, reload=True)
