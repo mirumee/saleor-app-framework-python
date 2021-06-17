@@ -1,9 +1,10 @@
 import hashlib
 import hmac
 import logging
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, List
 
 from fastapi import Depends, Header, HTTPException, Request
+import jwt
 
 from saleor_app.conf import Settings, get_settings
 from saleor_app.schemas.core import DomainName
@@ -126,6 +127,21 @@ def verify_webhook_signature():
             )
 
     return fun
+
+
+def require_permission(permissions: List):
+    async def func(
+        saleor_domain=Depends(saleor_domain_header),
+        saleor_token=Depends(saleor_token),
+        _token_is_valid=Depends(verify_saleor_token),
+    ):
+        jwt_payload = jwt.decode(saleor_token, verify=False)
+        user_permissions = set(jwt_payload.get("permissions", []))
+        if not set([p.value for p in permissions]) - user_permissions:
+            return True
+        raise Exception("Unauthorized user")
+
+    return func
 
 
 class ConfigurationFormDeps:
