@@ -10,7 +10,7 @@ from ..core.types import DomainName, WebhookData
 from ..core.validators import verify_token
 from ..schemas.webhooks.handlers import WebhookHandlers
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 SALEOR_DOMAIN_HEADER = "x-saleor-domain"
 SALEOR_TOKEN_HEADER = "x-saleor-token"

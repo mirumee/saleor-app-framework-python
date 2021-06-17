@@ -9,7 +9,7 @@ from .graphql import GraphQLError, get_executor, get_saleor_api_url
 from .mutations import CREATE_WEBHOOK
 from .types import AppToken, DomainName, Url, WebhookData
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 async def install_app(

@@ -9,7 +9,7 @@ from pydantic import BaseSettings, DirectoryPath, FilePath
 SETTINGS_ENV_VARIABLE = "APP_SETTINGS"
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 PROJECT_DIR = os.path.dirname(__file__)
 
 
