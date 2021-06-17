@@ -20,4 +20,4 @@ router.get("/", response_class=HTMLResponse, name="configuration-form")(get_form
 
 @router.get("/data")
 async def get_configuration_data(commons: ConfigurationDataDeps = Depends()):
-    return ConfigurationData(public_api_token="kaka", private_api_key=1)
+    return ConfigurationData(public_api_token="api_token", private_api_key=1)
