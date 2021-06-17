@@ -65,22 +65,19 @@ async def verify_saleor_token(
     return True
 
 
-def verify_saleor_domain(
-    # validate_domain: Callable[[DomainName], Awaitable[bool]],
+async def verify_saleor_domain(
     request: Request,
+    saleor_domain=Depends(saleor_domain_header),
 ) -> Callable[[], Awaitable[bool]]:
-    async def fun(saleor_domain=Depends(saleor_domain_header)) -> bool:
-        domain_is_valid = await request.app.extra["saleor"]["validate_domain"](
-            saleor_domain
+    domain_is_valid = await request.app.extra["saleor"]["validate_domain"](
+        saleor_domain
+    )
+    if not domain_is_valid:
+        logger.warning(f"Provided domain {saleor_domain} is invalid.")
+        raise HTTPException(
+            status_code=400, detail=f"Provided domain {saleor_domain} is invalid."
         )
-        if not domain_is_valid:
-            logger.warning(f"Provided domain {saleor_domain} is invalid.")
-            raise HTTPException(
-                status_code=400, detail=f"Provided domain {saleor_domain} is invalid."
-            )
-        return True
-
-    return fun
+    return True
 
 
 async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> str:

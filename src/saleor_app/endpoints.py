@@ -36,7 +36,6 @@ async def install(
     target_url = request.url_for("handle-webhook")
     domain = saleor_domain
     auth_token = data.auth_token
-
     try:
         await install_app(
             domain,
