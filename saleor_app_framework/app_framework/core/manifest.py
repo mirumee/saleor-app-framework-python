@@ -1,17 +1,15 @@
 import json
-import os
 
-from .conf import settings
+from .conf import get_settings
 
 MANIFEST = None
 
 
 def get_app_manifest():
     global MANIFEST
+    settings = get_settings()
     if MANIFEST is not None:
         return MANIFEST
-    if not os.path.exists(settings.MANIFEST_PATH):
-        return None
-    with open(settings.MANIFEST_PATH, mode="r") as f:
+    with open(settings.manifest_path, mode="r") as f:
         MANIFEST = json.load(f)
     return MANIFEST

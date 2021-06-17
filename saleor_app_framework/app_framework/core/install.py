@@ -3,13 +3,13 @@ import secrets
 import string
 from typing import Awaitable, Callable, List
 
-from ..core.conf import settings
+from ..core.conf import get_settings
 from .errors import InstallAppError
 from .graphql import GraphQLError, get_executor, get_saleor_api_url
 from .mutations import CREATE_WEBHOOK
 from .types import AppToken, DomainName, Url, WebhookData
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 async def install_app(
@@ -25,13 +25,15 @@ async def install_app(
     api_url = get_saleor_api_url(domain)
     executor = get_executor(host=api_url, auth_token=token)
 
+    settings = get_settings()
+
     response, errors = await executor(
         CREATE_WEBHOOK,
         variables={
             "input": {
                 "targetUrl": target_url,
                 "events": [event.upper() for event in events],
-                "name": settings.APP_NAME,
+                "name": settings.app_name,
                 "secretKey": secret_key,
             }
         },
