@@ -97,7 +97,7 @@ app.configuration_router.get("/", response_class=HTMLResponse, name="configurati
 
 @app.configuration_router.get("/data")
 async def get_configuration_data(commons: ConfigurationDataDeps = Depends()):
-    return ConfigurationData(public_api_token="kaka", private_api_key=1)
+    return ConfigurationData(public_api_token="api_token", private_api_key=1)
 
 
 app.include_saleor_app_routes()
