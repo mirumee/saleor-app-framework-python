@@ -133,7 +133,9 @@ def require_permission(permissions: List):
     async def func(
         saleor_domain=Depends(saleor_domain_header),
         saleor_token=Depends(saleor_token),
-        _token_is_valid=Depends(verify_saleor_token),
+        # TODO: this needs to happen but there's hope that Saleor will go with 
+        # an RS JWT sign.
+        # _token_is_valid=Depends(verify_saleor_token),
     ):
         jwt_payload = jwt.decode(saleor_token, verify=False)
         user_permissions = set(jwt_payload.get("permissions", []))

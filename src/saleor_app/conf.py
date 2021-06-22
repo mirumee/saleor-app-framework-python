@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     project_dir: Path
     static_dir: Path
     templates_dir: Path
-    manifest_path: Path
     debug: bool = True
     manifest: SettingsManifest
     dev_saleor_domain: Optional[str] = None

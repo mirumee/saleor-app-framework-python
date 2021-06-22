@@ -56,13 +56,14 @@ async def handle_webhook(
     request: Request,
     payload: List[Any],  # FIXME provide a way to proper define payload types
     _domain_is_valid=Depends(verify_saleor_domain),
+    saleor_domain=Depends(saleor_domain_header),
     event_type=Depends(webhook_event_type),
     _signature_is_valid=Depends(verify_webhook_signature),
 ):
     response = {}
     handler = request.app.extra["saleor"]["webhook_handlers"].get(event_type)
     if handler is not None:
-        response = await handler(payload)
+        response = await handler(payload, request, saleor_domain)
     return response or {}
 
 
