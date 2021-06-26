@@ -11,6 +11,7 @@ uvicorn = "^0.14.0"
 Jinja2 = "^2.11.3"
 aiofiles = "^0.6.0"
 aiohttp = "^3.7.4"
+jwt = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.22.0"
@@ -25,6 +26,7 @@ pre-commit = "^2.12.1"
 tox = "^3.23.1"
 tox-poetry = "^0.4.0"
 ipdb = "^0.13.9"
+httpx = "^0.18.2"
 
 [tool.black]
 target_version = ['py38']
@@ -79,14 +81,14 @@ commands =
 [testenv:lint]
 description = check the code style
 basepython = python3.9
-commands = 
+commands =
     black --diff --check src/saleor_app
     isort -c -rc --diff src/saleor_app
     flake8 src/saleor_app
 
 [testenv:coverage]
 description = [run locally after tests]: combine coverage data and create report
-deps = 
+deps =
     coverage
 skip_install = True
 commands =

@@ -9,7 +9,7 @@ from saleor_app.graphql import GraphQLError, get_executor, get_saleor_api_url
 from saleor_app.mutations import CREATE_WEBHOOK
 from saleor_app.schemas.core import AppToken, DomainName, Url, WebhookData
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__file__)
 
 
 async def install_app(
@@ -20,7 +20,7 @@ async def install_app(
     save_app_data: Callable[[DomainName, WebhookData], Awaitable],
 ):
     alphabet = string.ascii_letters + string.digits
-    secret_key = "".join(secrets.choice(alphabet) for i in range(20))
+    secret_key = "".join(secrets.choice(alphabet) for _ in range(20))
 
     api_url = get_saleor_api_url(domain)
     executor = get_executor(host=api_url, auth_token=token)
@@ -40,9 +40,10 @@ async def install_app(
     )
 
     if errors:
-        raise GraphQLError("Webhook create mutation raised an error.")
+        logger.warning("Webhook create mutation raised an error")
+        raise GraphQLError("Webhook create mutation raised an error")
 
-    webhook_error = response["data"].get("webhookErrors")
+    webhook_error = response["data"]["webhookCreate"].get("errors")
     if webhook_error:
         logger.warning(
             "Unable to finish installation of app for %s. Received error: %s",
