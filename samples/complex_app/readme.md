@@ -1,0 +1,5 @@
+## Prerequisites
+
+```
+pip install SQLAlchemy
+```
