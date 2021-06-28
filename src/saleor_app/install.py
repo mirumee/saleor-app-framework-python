@@ -5,26 +5,11 @@ from typing import Awaitable, Callable, List
 
 from saleor_app.conf import get_settings
 from saleor_app.errors import InstallAppError
-from saleor_app.graphql import GraphqlError, get_executor, get_saleor_api_url
+from saleor_app.graphql import GraphQLError, get_executor, get_saleor_api_url
+from saleor_app.mutations import CREATE_WEBHOOK
 from saleor_app.schemas.core import AppToken, DomainName, Url, WebhookData
 
-logger = logging.getLogger(__file__)
-
-
-CREATE_WEBHOOK = """
-mutation WebhookCreate($input: WebhookCreateInput!){
-    webhookCreate(input: $input){
-        webhookErrors{
-         field
-         message
-         code
-       }
-       webhook {
-             id
-       }
-   }
-}
-"""
+logger = logging.getLogger(__name__)
 
 
 async def install_app(
@@ -42,7 +27,7 @@ async def install_app(
 
     settings = get_settings()
 
-    response = await executor(
+    response, errors = await executor(
         CREATE_WEBHOOK,
         variables={
             "input": {
@@ -54,8 +39,8 @@ async def install_app(
         },
     )
 
-    if response.get("errors"):
-        raise GraphqlError("Webhook create mutation raised an error")
+    if errors:
+        raise GraphQLError("Webhook create mutation raised an error.")
 
     webhook_error = response["data"].get("webhookErrors")
     if webhook_error:
@@ -64,7 +49,7 @@ async def install_app(
             domain,
             webhook_error,
         )
-        raise InstallAppError("Failed to create webhook for %s", domain)
+        raise InstallAppError("Failed to create webhook for %s.", domain)
 
     saleor_webhook_id = response["data"]["webhookCreate"]["webhook"]["id"]
     install_app_data = WebhookData(

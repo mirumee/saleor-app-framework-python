@@ -6,15 +6,15 @@ from fastapi.param_functions import Depends
 from fastapi.templating import Jinja2Templates
 
 from saleor_app.deps import (
+    ConfigurationFormDeps,
     get_settings,
     saleor_domain_header,
     verify_saleor_domain,
     verify_webhook_signature,
     webhook_event_type,
-    ConfigurationFormDeps,
 )
 from saleor_app.errors import InstallAppError
-from saleor_app.graphql import GraphqlError
+from saleor_app.graphql import GraphQLError
 from saleor_app.install import install_app
 from saleor_app.schemas.core import InstallData
 from saleor_app.schemas.manifest import Manifest
@@ -44,7 +44,7 @@ async def install(
             target_url,
             request.app.extra["saleor"]["save_app_data"],
         )
-    except (InstallAppError, GraphqlError):
+    except (InstallAppError, GraphQLError):
         raise HTTPException(
             status_code=403, detail="Incorrect token or not enough permissions"
         )
@@ -74,6 +74,6 @@ async def get_form(commons: ConfigurationFormDeps = Depends()):
         "domain": commons.saleor_domain,
         "token": commons.token,
     }
-    return Jinja2Templates(directory=commons.settings.static_dir).TemplateResponse(
+    return Jinja2Templates(directory=str(commons.settings.static_dir)).TemplateResponse(
         "configuration/index.html", context
     )

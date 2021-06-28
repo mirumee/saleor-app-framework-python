@@ -1,22 +1,20 @@
 import os
 from pathlib import Path
 
+import uvicorn
 from fastapi.param_functions import Depends
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from pydantic import BaseModel
-import uvicorn
 
 from saleor_app.app import SaleorApp
 from saleor_app.conf import Settings
-from saleor_app.deps import ConfigurationFormDeps, ConfigurationDataDeps
+from saleor_app.deps import ConfigurationDataDeps
 from saleor_app.endpoints import get_form
-from saleor_app.schemas.handlers import Payload, WebhookHandlers
 from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.handlers import Payload, WebhookHandlers
 from saleor_app.schemas.manifest import SettingsManifest
-
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -25,7 +23,6 @@ settings = Settings(
     project_dir=PROJECT_DIR,
     static_dir=PROJECT_DIR / "static",
     templates_dir=PROJECT_DIR / "static",
-    manifest_path=PROJECT_DIR / "manifest.json",
     debug=True,
     manifest=SettingsManifest(
         name="Sample Saleor App",
@@ -38,7 +35,7 @@ settings = Settings(
         appUrl="http://172.17.0.1:5000/appUrl",
         tokenTargetUrl="http://172.17.0.1:5000/tokenTargetUrl",
         id="saleor-simple-sample",
-        permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"]
+        permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
     ),
     dev_saleor_domain="127.0.0.1:5000",
     dev_saleor_token="test_token",
@@ -50,7 +47,7 @@ class ConfigurationData(BaseModel):
     private_api_key: int
 
 
-async def validate_domain(domain_name:str)->bool:
+async def validate_domain(domain_name: str) -> bool:
     return domain_name == "172.17.0.1:8000"
 
 
@@ -92,21 +89,24 @@ app = SaleorApp(
     webhook_handlers=webhook_handlers,
     get_webhook_details=get_webhook_details,
 )
-app.configuration_router.get("/", response_class=HTMLResponse, name="configuration-form")(get_form)
+app.configuration_router.get(
+    "/", response_class=HTMLResponse, name="configuration-form"
+)(get_form)
 
 
 @app.configuration_router.get("/data")
 async def get_configuration_data(commons: ConfigurationDataDeps = Depends()):
-    return ConfigurationData(public_api_token="api_token", private_api_key=1)
+    return ConfigurationData(public_api_token="api_token", private_api_key=11)
 
 
 app.include_saleor_app_routes()
 
 
-app.add_middleware(CORSMiddleware,
-        allow_origins=["*"],
-        allow_headers=["*"],
-        allow_methods=["OPTIONS", "GET", "POST"],
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_headers=["*"],
+    allow_methods=["OPTIONS", "GET", "POST"],
 )
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 

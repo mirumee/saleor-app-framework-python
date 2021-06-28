@@ -3,15 +3,15 @@ import hmac
 import logging
 from typing import Awaitable, Callable, List
 
-from fastapi import Depends, Header, HTTPException, Request
 import jwt
+from fastapi import Depends, Header, HTTPException, Request
 
 from saleor_app.conf import Settings, get_settings
 from saleor_app.schemas.core import DomainName
 from saleor_app.schemas.handlers import WebhookHandlers
 from saleor_app.validators import verify_token
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 SALEOR_DOMAIN_HEADER = "x-saleor-domain"
 SALEOR_TOKEN_HEADER = "x-saleor-token"
@@ -26,9 +26,9 @@ async def saleor_domain_header(
     if settings.debug:
         saleor_domain = saleor_domain or settings.dev_saleor_domain
     if not saleor_domain:
-        logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header")
+        logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header.")
         raise HTTPException(
-            status_code=400, detail=f"Missing {SALEOR_DOMAIN_HEADER.upper()} header"
+            status_code=400, detail=f"Missing {SALEOR_DOMAIN_HEADER.upper()} header."
         )
     return saleor_domain
 
@@ -40,9 +40,9 @@ async def saleor_token(
     if settings.debug:
         token = token or settings.dev_saleor_token
     if not token:
-        logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header")
+        logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(
-            status_code=400, detail=f"Missing {SALEOR_TOKEN_HEADER.upper()} header"
+            status_code=400, detail=f"Missing {SALEOR_TOKEN_HEADER.upper()} header."
         )
     return token
 
@@ -89,7 +89,7 @@ async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> s
         )
     if event not in WebhookHandlers.__fields__:
         logger.error(
-            "Event from %s header %s doesn't have own handler",
+            "Event from %s header %s doesn't have own handler.",
             SALEOR_EVENT_HEADER,
             event,
         )
@@ -133,7 +133,7 @@ def require_permission(permissions: List):
     async def func(
         saleor_domain=Depends(saleor_domain_header),
         saleor_token=Depends(saleor_token),
-        # TODO: this needs to happen but there's hope that Saleor will go with 
+        # TODO: this needs to happen but there's hope that Saleor will go with
         # an RS JWT sign.
         # _token_is_valid=Depends(verify_saleor_token),
     ):

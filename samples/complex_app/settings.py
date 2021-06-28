@@ -3,7 +3,6 @@ from pathlib import Path
 from saleor_app.conf import Settings
 from saleor_app.schemas.manifest import SettingsManifest
 
-
 PROJECT_DIR = Path(__file__).parent
 
 
@@ -16,7 +15,6 @@ settings = AppSettings(
     project_dir=PROJECT_DIR,
     static_dir=PROJECT_DIR / "static",
     templates_dir=PROJECT_DIR / "static",
-    manifest_path=PROJECT_DIR / "manifest.json",
     debug=True,
     manifest=SettingsManifest(
         name="Sample Saleor App",
@@ -29,9 +27,9 @@ settings = AppSettings(
         appUrl="http://172.17.0.1:5000/appUrl",
         tokenTargetUrl="http://172.17.0.1:5000/tokenTargetUrl",
         id="saleor-complex-sample",
-        permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"]
+        permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
     ),
     dev_saleor_domain="127.0.0.1:5000",
     dev_saleor_token="test_token",
-    database_dsn="sqlite:///db.sqlite3"
+    database_dsn="sqlite:///db.sqlite3",
 )
