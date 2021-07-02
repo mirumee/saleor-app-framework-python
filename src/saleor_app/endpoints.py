@@ -21,7 +21,7 @@ from saleor_app.schemas.manifest import Manifest
 
 
 async def manifest(request: Request, settings=Depends(get_settings)):
-    manifest = settings.manifest.dict()
+    manifest = settings.manifest.dict(by_alias=True)
     manifest["tokenTargetUrl"] = request.url_for("app-install")
     manifest["configurationUrl"] = request.url_for("configuration-form")
     return Manifest(**manifest)
@@ -63,7 +63,7 @@ async def handle_webhook(
     response = {}
     handler = request.app.extra["saleor"]["webhook_handlers"].get(event_type)
     if handler is not None:
-        response = await handler(payload, request, saleor_domain)
+        response = await handler(payload, saleor_domain, request)
     return response or {}
 
 

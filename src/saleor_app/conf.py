@@ -1,3 +1,4 @@
+from typing import Type
 import logging
 import os
 from functools import lru_cache
@@ -25,7 +26,7 @@ class Settings(BaseSettings):
 
 
 @lru_cache()
-def get_settings() -> Settings:
+def get_settings() -> Type[Settings]:
     settings_path = os.environ.get(SETTINGS_ENV_VARIABLE)
     if not settings_path:
         raise Exception(
