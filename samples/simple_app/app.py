@@ -9,12 +9,11 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 from saleor_app.app import SaleorApp
-from saleor_app.conf import Settings
+from saleor_app.conf import Settings, SettingsManifest
 from saleor_app.deps import ConfigurationDataDeps
 from saleor_app.endpoints import get_form
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
-from saleor_app.schemas.manifest import SettingsManifest
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -28,12 +27,10 @@ settings = Settings(
         name="Sample Saleor App",
         version="0.1.0",
         about="Sample Saleor App seving as an example.",
-        dataPrivacy="",
-        dataPrivacyUrl="",
-        homepageUrl="http://172.17.0.1:5000/homepageUrl",
-        supportUrl="http://172.17.0.1:5000/supportUrl",
-        appUrl="http://172.17.0.1:5000/appUrl",
-        tokenTargetUrl="http://172.17.0.1:5000/tokenTargetUrl",
+        data_privacy="",
+        data_privacy_url="",
+        homepage_url="http://172.17.0.1:5000/homepageUrl",
+        support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-simple-sample",
         permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
     ),
@@ -61,17 +58,17 @@ async def get_webhook_details(domain_name: DomainName):
     print("Called store_app_data")
 
 
-async def product_created(payload: Payload):
+async def product_created(payload: Payload, saleor_domain: DomainName):
     print("Product created!")
     print(payload)
 
 
-async def product_updated(payload: Payload):
+async def product_updated(payload: Payload, saleor_domain: DomainName):
     print("Product updated!")
     print(payload)
 
 
-async def product_deleted(payload: Payload):
+async def product_deleted(payload: Payload, saleor_domain: DomainName):
     print("Product deleted!")
     print(payload)
 

@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from saleor_app.conf import Settings
-from saleor_app.schemas.manifest import SettingsManifest
+from saleor_app.conf import Settings, SettingsManifest
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -20,12 +19,10 @@ settings = AppSettings(
         name="Sample Saleor App",
         version="0.1.0",
         about="Sample Saleor App seving as an example.",
-        dataPrivacy="",
-        dataPrivacyUrl="",
-        homepageUrl="http://172.17.0.1:5000/homepageUrl",
-        supportUrl="http://172.17.0.1:5000/supportUrl",
-        appUrl="http://172.17.0.1:5000/appUrl",
-        tokenTargetUrl="http://172.17.0.1:5000/tokenTargetUrl",
+        data_privacy="",
+        data_privacy_url="",
+        homepage_url="http://172.17.0.1:5000/homepageUrl",
+        support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-complex-sample",
         permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
     ),

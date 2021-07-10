@@ -11,8 +11,8 @@ from saleor_app.endpoints import get_form
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
 
-
 os.environ["APP_SETTINGS"] = "saleor_app.tests.conftest.test_app_settings"
+
 
 class ConfigurationData(BaseModel):
     public_api_token: str
@@ -31,16 +31,17 @@ async def get_webhook_details(domain_name: DomainName):
     ...
 
 
-async def product_created(payload: Payload):
+async def product_created(payload: Payload, saleor_domain: DomainName):
     ...
 
 
-async def product_updated(payload: Payload):
+async def product_updated(payload: Payload, saleor_domain: DomainName):
     ...
 
 
-async def product_deleted(payload: Payload):
+async def product_deleted(payload: Payload, saleor_domain: DomainName):
     ...
+
 
 def get_app():
     webhook_handlers = WebhookHandlers(

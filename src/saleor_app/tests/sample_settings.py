@@ -1,20 +1,19 @@
 from pathlib import Path
 
-from saleor_app.conf import Settings
-from saleor_app.schemas.manifest import SettingsManifest
+from saleor_app.conf import Settings, SettingsManifest
 
 manifest = SettingsManifest(
     name="SampleApp",
     version="1.0.0",
     about="",
-    dataPrivacy="",
-    dataPrivacyUrl="127.0.0.1:8888/app-info/privacy",
-    homepageUrl="127.0.0.1:8888/app-info/homepage",
-    supportUrl="127.0.0.1:8888/app-info/support",
+    data_privacy="",
+    data_privacy_url="127.0.0.1:8888/app-info/privacy",
+    homepage_url="127.0.0.1:8888/app-info/homepage",
+    support_url="127.0.0.1:8888/app-info/support",
     id="sample-app",
     permissions=[],
-    appUrl="127.0.0.1:8000/app",
 )
+
 test_app_settings = Settings(
     static_dir=Path("."),
     project_dir=Path("."),

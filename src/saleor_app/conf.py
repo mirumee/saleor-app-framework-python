@@ -6,11 +6,41 @@ from typing import Optional
 
 from pydantic import BaseSettings
 
-from saleor_app.schemas.manifest import SettingsManifest
+from saleor_app.schemas import manifest
 from saleor_app.utils import import_string
 
 SETTINGS_ENV_VARIABLE = "APP_SETTINGS"
 logger = logging.getLogger(__file__)
+
+
+class SettingsManifest(BaseSettings, manifest.SettingsManifest):
+    class Config:
+        allow_population_by_field_name = True
+        env_prefix = "manifest_"
+
+        # Pydatnic raises a FutureWarning when we use alias parameter without env
+        # parameter. The reason for that is that they dropped support for assigning
+        # settings from ENV by alias name. The 'fields' is only required to
+        fields = {
+            "data_privacy": {
+                "env": "manifest_data_privacy",
+            },
+            "data_privacy_url": {
+                "env": "manifest_data_privacy_url",
+            },
+            "homepage_url": {
+                "env": "manifest_homepage_url",
+            },
+            "support_url": {
+                "env": "manifest_support_url",
+            },
+            "app_url": {
+                "env": "manifest_app_url",
+            },
+            "configuration_url": {
+                "env": "manifest_configuration_url",
+            },
+        }
 
 
 class Settings(BaseSettings):
