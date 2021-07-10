@@ -1,16 +1,21 @@
+from typing import Awaitable, Callable
+
 from fastapi import APIRouter, FastAPI
+
+from saleor_app.endpoints import handle_webhook, install, manifest
+from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.handlers import WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
-from saleor_app.endpoints import manifest, install, handle_webhook
 
 
 class SaleorApp(FastAPI):
     def __init__(
         self,
         *,
-        validate_domain,
-        save_app_data,
-        webhook_handlers,
-        get_webhook_details,
+        validate_domain: Callable[[DomainName], Awaitable[bool]],
+        save_app_data: Callable[[DomainName, WebhookData], Awaitable],
+        webhook_handlers: WebhookHandlers,
+        get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
         **kwargs,
     ):
         super().__init__(**kwargs)
