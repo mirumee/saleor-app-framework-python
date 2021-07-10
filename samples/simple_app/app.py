@@ -44,7 +44,7 @@ class ConfigurationData(BaseModel):
     private_api_key: int
 
 
-async def validate_domain(domain_name: str) -> bool:
+async def validate_domain(domain_name: DomainName) -> bool:
     return domain_name == "172.17.0.1:8000"
 
 
@@ -54,8 +54,12 @@ async def store_app_data(domain_name: DomainName, app_data: WebhookData):
     print(app_data)
 
 
-async def get_webhook_details(domain_name: DomainName):
-    print("Called store_app_data")
+async def get_webhook_details(domain_name: DomainName) -> WebhookData:
+    return WebhookData(
+        token="auth-token",
+        webhook_id="webhook-id",
+        webhook_secret_key="webhook-secret-key",
+    )
 
 
 async def product_created(payload: Payload, saleor_domain: DomainName):

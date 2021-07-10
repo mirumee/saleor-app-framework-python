@@ -28,7 +28,11 @@ async def store_app_data(domain_name: DomainName, app_data: WebhookData):
 
 
 async def get_webhook_details(domain_name: DomainName):
-    ...
+    return WebhookData(
+        token="auth-token",
+        webhook_id="webhook-id",
+        webhook_secret_key="webhook-secret-key",
+    )
 
 
 async def product_created(payload: Payload, saleor_domain: DomainName):

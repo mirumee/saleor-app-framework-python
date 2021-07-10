@@ -1,17 +1,20 @@
-from unittest.mock import AsyncMock, MagicMock, Mock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import AsyncClient
 
 from saleor_app.conf import get_settings
 from saleor_app.deps import (
+    SALEOR_DOMAIN_HEADER,
+    SALEOR_EVENT_HEADER,
+    SALEOR_SIGNATURE_HEADER,
     saleor_domain_header,
     verify_saleor_domain,
     verify_webhook_signature,
     webhook_event_type,
 )
 from saleor_app.schemas.handlers import WebhookHandlers
-from saleor_app.tests.sample_app import get_app, store_app_data
+from saleor_app.tests.sample_app import store_app_data
 
 
 @pytest.mark.asyncio
@@ -32,15 +35,21 @@ async def test_manifest(app):
 
 @pytest.mark.asyncio
 async def test_install(app, monkeypatch):
-    app.dependency_overrides[verify_saleor_domain] = lambda: True
-    app.dependency_overrides[saleor_domain_header] = lambda: "example.com"
-
     install_app_mock = AsyncMock()
     monkeypatch.setattr("saleor_app.endpoints.install_app", install_app_mock)
 
     base_url = "http://test"
+
+    validate_domain_mock = AsyncMock(return_value=True)
+    app.extra["saleor"]["validate_domain"] = validate_domain_mock
+
     async with AsyncClient(app=app, base_url=base_url) as ac:
-        await ac.post("configuration/install", json={"auth_token": "saleor-app-token"})
+        response = await ac.post(
+            "configuration/install",
+            json={"auth_token": "saleor-app-token"},
+            headers={SALEOR_DOMAIN_HEADER: "example.com"},
+        )
+        assert response.status_code == 200
     install_app_mock.assert_awaited_once_with(
         "example.com",
         "saleor-app-token",
@@ -48,6 +57,8 @@ async def test_install(app, monkeypatch):
         "http://test/webhook/",
         store_app_data,
     )
+
+    assert validate_domain_mock.called
 
 
 @pytest.mark.asyncio
@@ -117,29 +128,153 @@ async def test_install_missing_saleor_domain_header(app, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_handle_webhook(monkeypatch):
-    product_created_mock = AsyncMock(return_value="")
-    product_updated_mock = AsyncMock(return_value="")
-    monkeypatch.setattr(
-        "saleor_app.tests.sample_app.product_created", product_created_mock
-    )
-
+async def test_handle_webhook_incorrect_domain_header(app):
     saleor_domain = "example.com"
-    app = get_app()
 
-    verify_saleor_domain_mock = Mock(return_value=True)
-    saleor_domain_header_mock = Mock(return_value=saleor_domain)
-    webhook_event_type_mock = Mock(return_value="product_created")
-    verify_webhook_signature_mock = Mock(return_value=lambda: True)
-
-    app.dependency_overrides[verify_saleor_domain] = lambda: verify_saleor_domain_mock()
-    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain_header_mock()
-    app.dependency_overrides[webhook_event_type] = lambda: webhook_event_type_mock()
-    app.dependency_overrides[
-        verify_webhook_signature
-    ] = lambda: verify_webhook_signature_mock()
+    app.dependency_overrides[webhook_event_type] = lambda: "product_created"
+    app.dependency_overrides[verify_webhook_signature] = lambda: True
 
     base_url = "http://test.com"
+
+    validate_domain_mock = AsyncMock(return_value=False)
+    app.extra["saleor"]["validate_domain"] = validate_domain_mock
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post(
+            "/webhook",
+            json=webhook_payload,
+            headers={SALEOR_DOMAIN_HEADER: saleor_domain},
+        )
+        assert response.status_code == 400
+    assert validate_domain_mock.called
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_missing_domain_header(app):
+    app.dependency_overrides[webhook_event_type] = lambda: "product_created"
+    app.dependency_overrides[verify_webhook_signature] = lambda: True
+
+    base_url = "http://test.com"
+
+    validate_domain_mock = AsyncMock(return_value=False)
+    app.extra["saleor"]["validate_domain"] = validate_domain_mock
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post("/webhook", json=webhook_payload)
+        assert response.status_code == 400
+    assert not validate_domain_mock.called
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_missing_event_type_header(app):
+    saleor_domain = "example.com"
+
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
+
+    app.dependency_overrides[verify_webhook_signature] = lambda: True
+
+    base_url = "http://test.com"
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post("/webhook", json=webhook_payload)
+        assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_incorrect_event_type_header(app):
+    saleor_domain = "example.com"
+
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
+    app.dependency_overrides[verify_webhook_signature] = lambda: True
+
+    base_url = "http://test.com"
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post(
+            "/webhook",
+            json=webhook_payload,
+            headers={SALEOR_EVENT_HEADER: "incorrect_event_type"},
+        )
+        assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_missing_signature_header(app):
+    saleor_domain = "example.com"
+
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
+    app.dependency_overrides[webhook_event_type] = lambda: "product_created"
+
+    base_url = "http://test.com"
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post("/webhook", json=webhook_payload)
+        assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_incorrect_signature_header(app):
+    saleor_domain = "example.com"
+
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
+    app.dependency_overrides[webhook_event_type] = lambda: "product_created"
+
+    base_url = "http://test.com"
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post(
+            "/webhook",
+            json=webhook_payload,
+            headers={SALEOR_SIGNATURE_HEADER: "incorrect"},
+        )
+        assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook_correct_signature_header(app):
+    saleor_domain = "example.com"
+
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
+    app.dependency_overrides[webhook_event_type] = lambda: "product_created"
+
+    base_url = "http://test.com"
+
+    webhook_payload = [{"data": "webhook-data"}]
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post(
+            "/webhook",
+            json=webhook_payload,
+            headers={
+                SALEOR_SIGNATURE_HEADER: (
+                    "1d58736bf95a69ac1788c2548d5eef226aedf87a9794d42ba48609aeca760683"
+                ),
+            },
+        )
+        assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_handle_webhook(app):
+    product_created_mock = AsyncMock(return_value="")
+    product_updated_mock = AsyncMock(return_value="")
+
+    saleor_domain = "example.com"
+
+    base_url = "http://test.com"
+
+    validate_domain_mock = AsyncMock(return_value=True)
+    app.extra["saleor"]["validate_domain"] = validate_domain_mock
 
     app.extra["saleor"]["webhook_handlers"] = WebhookHandlers(
         product_created=product_created_mock,
@@ -147,12 +282,18 @@ async def test_handle_webhook(monkeypatch):
     )
     webhook_payload = [{"data": "webhook-data"}]
     async with AsyncClient(app=app, base_url=base_url) as ac:
-        await ac.post("/webhook", json=webhook_payload)
+        response = await ac.post(
+            "/webhook",
+            json=webhook_payload,
+            headers={
+                SALEOR_EVENT_HEADER: "product_created",
+                SALEOR_SIGNATURE_HEADER: (
+                    "1d58736bf95a69ac1788c2548d5eef226aedf87a9794d42ba48609aeca760683"
+                ),
+                SALEOR_DOMAIN_HEADER: saleor_domain,
+            },
+        )
+        assert response.status_code == 200
+
     product_created_mock.assert_called_once_with(webhook_payload, saleor_domain)
-
     assert not product_updated_mock.called
-
-    assert verify_saleor_domain_mock.called
-    assert saleor_domain_header_mock.called
-    assert webhook_event_type_mock.called
-    assert verify_webhook_signature_mock.called

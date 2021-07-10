@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import logging
-from typing import Awaitable, Callable, List
+from typing import List
 
 import jwt
 from fastapi import Depends, Header, HTTPException, Request
@@ -69,7 +69,7 @@ async def verify_saleor_token(
 async def verify_saleor_domain(
     request: Request,
     saleor_domain=Depends(saleor_domain_header),
-) -> Callable[[], Awaitable[bool]]:
+) -> bool:
     domain_is_valid = await request.app.extra["saleor"]["validate_domain"](
         saleor_domain
     )
@@ -103,30 +103,33 @@ async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> s
     return event
 
 
-def verify_webhook_signature():
-    async def fun(
-        request: Request,
-        signature=Header(None, alias=SALEOR_SIGNATURE_HEADER),
-        domain_name=Depends(saleor_domain_header),
-    ) -> bool:
-        webhook_details = await request.app.extra["saleor"]["get_webhook_details"](
-            domain_name
+async def verify_webhook_signature(
+    request: Request,
+    signature=Header(None, alias=SALEOR_SIGNATURE_HEADER),
+    domain_name=Depends(saleor_domain_header),
+):
+    if not signature:
+        raise HTTPException(
+            status_code=401,
+            detail=(f"Missing signature header - {SALEOR_SIGNATURE_HEADER}"),
         )
-        content = await request.body()
-        signature_bytes = bytes(signature, "utf-8")
-        secret_key_bytes = bytes(webhook_details.webhook_secret_key, "utf-8")
+    webhook_details = await request.app.extra["saleor"]["get_webhook_details"](
+        domain_name
+    )
+    content = await request.body()
+    webhook_signature_bytes = bytes(signature, "utf-8")
 
-        content_signature_str = hmac.new(
-            secret_key_bytes, content, hashlib.sha256
-        ).hexdigest()
-        content_signature = bytes(content_signature_str, "utf-8")
-        if not hmac.compare_digest(content_signature, signature_bytes):
-            raise HTTPException(
-                status_code=401,
-                detail=(f"Invalid webhook signature for {SALEOR_SIGNATURE_HEADER}"),
-            )
+    secret_key_bytes = bytes(webhook_details.webhook_secret_key, "utf-8")
+    content_signature_str = hmac.new(
+        secret_key_bytes, content, hashlib.sha256
+    ).hexdigest()
+    content_signature = bytes(content_signature_str, "utf-8")
 
-    return fun
+    if not hmac.compare_digest(content_signature, webhook_signature_bytes):
+        raise HTTPException(
+            status_code=401,
+            detail=(f"Invalid webhook signature for {SALEOR_SIGNATURE_HEADER}"),
+        )
 
 
 def require_permission(permissions: List):
