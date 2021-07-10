@@ -10,7 +10,7 @@ from saleor_app.schemas import manifest
 from saleor_app.utils import import_string
 
 SETTINGS_ENV_VARIABLE = "APP_SETTINGS"
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class SettingsManifest(BaseSettings, manifest.SettingsManifest):
