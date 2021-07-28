@@ -79,10 +79,10 @@ async def test_install_app_graphql_error(monkeypatch):
     response.get.side_effect = json_failed_response.get
 
     errors = [
-            {
-                "message": "You do not have permission to perform this action",
-            }
-        ]
+        {
+            "message": "You do not have permission to perform this action",
+        }
+    ]
 
     mocked_executor = AsyncMock(return_value=(response, errors))
     monkeypatch.setattr(

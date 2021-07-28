@@ -12,6 +12,7 @@ Jinja2 = "^2.11.3"
 aiofiles = "^0.6.0"
 aiohttp = "^3.7.4"
 jwt = "^1.2.0"
+SQLAlchemy = "^1.4.22"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.22.0"
