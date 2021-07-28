@@ -52,25 +52,25 @@ async def manifest(request: Request, settings=Depends(get_settings)):
 
 async def install(
     request: Request,
-    data: InstallData,
-    _domain_is_valid=Depends(verify_saleor_domain),
-    saleor_domain=Depends(saleor_domain_header),
+    # data: InstallData,
+    # _domain_is_valid=Depends(verify_saleor_domain),
+    # saleor_domain=Depends(saleor_domain_header),
 ):
-    target_url = request.url_for("handle-webhook")
-    domain = saleor_domain
-    auth_token = data.auth_token
-    try:
-        await install_app(
-            domain,
-            auth_token,
-            request.app.extra["saleor"]["webhook_handlers"].get_assigned_events(),
-            target_url,
-            request.app.extra["saleor"]["save_app_data"],
-        )
-    except (InstallAppError, GraphQLError):
-        raise HTTPException(
-            status_code=403, detail="Incorrect token or not enough permissions"
-        )
+    # target_url = request.url_for("handle-webhook")
+    # domain = saleor_domain
+    # auth_token = data.auth_token
+    # try:
+    #     await install_app(
+    #         domain,
+    #         auth_token,
+    #         request.app.extra["saleor"]["webhook_handlers"].get_assigned_events(),
+    #         target_url,
+    #         request.app.extra["saleor"]["save_app_data"],
+    #     )
+    # except (InstallAppError, GraphQLError):
+    #     raise HTTPException(
+    #         status_code=403, detail="Incorrect token or not enough permissions"
+    #     )
 
     return {}
 
