@@ -21,3 +21,4 @@ class Manifest(SettingsManifest):
     app_url: str = Field(..., alias="appUrl")
     configuration_url: str = Field(..., alias="configurationUrl")
     token_target_url: str = Field(..., alias="tokenTargetUrl")
+    extensions: List[dict] = Field(...)
