@@ -31,16 +31,20 @@ async def manifest(request: Request, settings=Depends(get_settings)):
             "view": "PRODUCT",
             "type": "OVERVIEW",
             "target": "CREATE",
-            "permissions": ["MANAGE_PRODUCTS", ],
-            "url": request.url_for("configuration-form")
+            "permissions": [
+                "MANAGE_PRODUCTS",
+            ],
+            "url": request.url_for("configuration-form"),
         },
         {
             "label": "Test2",
             "view": "PRODUCT",
             "type": "OVERVIEW",
             "target": "CREATE",
-            "permissions": ["MANAGE_PRODUCTS", ],
-            "url": request.url_for("configuration-form")
+            "permissions": [
+                "MANAGE_PRODUCTS",
+            ],
+            "url": request.url_for("configuration-form"),
         },
     ]
     return Manifest(**manifest)

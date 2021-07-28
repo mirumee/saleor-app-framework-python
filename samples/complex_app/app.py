@@ -13,7 +13,7 @@ from saleor_app.schemas.core import DomainName, WebhookData
 
 
 async def validate_domain(domain_name: DomainName) -> bool:
-    return True# domain_name == "172.17.0.1:8000"
+    return True  # domain_name == "172.17.0.1:8000"
 
 
 async def store_app_data(domain_name: DomainName, app_data: WebhookData):
