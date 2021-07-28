@@ -57,4 +57,5 @@ app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
 if __name__ == "__main__":
     os.environ["APP_SETTINGS"] = "app.settings"
-    uvicorn.run("app:app", host="0.0.0.0", port=80, debug=True, reload=True)
+    port = os.environ.get("PORT") or 80
+    uvicorn.run("app:app", host="0.0.0.0", port=port, debug=True, reload=True)
