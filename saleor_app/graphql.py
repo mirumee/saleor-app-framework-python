@@ -48,7 +48,7 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
         try:
             response = await client.request(
                 "POST",
-                url=host,
+                url="http://extend-install-app-logic-to-handle-extensions.api.saleor.rocks/graphql/",
                 json=data,
                 headers=headers,
                 timeout=timeout,
