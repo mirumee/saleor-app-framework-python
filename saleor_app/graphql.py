@@ -16,7 +16,7 @@ def get_saleor_api_url(domain: str) -> str:
     settings = get_settings()
     if settings.debug:
         logger.warning("Using non secured protocol")
-        protocol = "http"
+    protocol = "http"
     url = f"{protocol}://{domain}"
     return f"{url}/graphql/"
 
@@ -48,7 +48,7 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
         try:
             response = await client.request(
                 "POST",
-                url="http://extend-install-app-logic-to-handle-extensions.api.saleor.rocks/graphql/",
+                url=host,
                 json=data,
                 headers=headers,
                 timeout=timeout,
@@ -59,8 +59,6 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
             raise GraphQLError(e)
 
     try:
-        print(response)
-        print(response.__dict__)
         result = await response.json()
         errors = result.get("errors")
         if errors:
