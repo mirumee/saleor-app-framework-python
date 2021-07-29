@@ -60,6 +60,7 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
 
     try:
         print(response)
+        print(response.__dict__)
         result = await response.json()
         errors = result.get("errors")
         if errors:
