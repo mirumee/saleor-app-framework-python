@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Saleor-Klaviyo</title>
   </head>
-
   <body>
+    <button onclick="alert(window.localStorage.getItem('token'))">click to pwn</button>
     <div id="app" data-configuration-data-url={{ form_url }} data-token={{ token }} data-domain={{ domain }}></div>
-  <script type="text/javascript" src="/static/configuration/configuration.6e92ec3997eea6cea9b4.js?094935c45e5cb8fc0edb"></script></body>
+    <script>let token = window.localStorage.getItem('token');let channel = window.localStorage.getItem('channel');console.log({ token, channel })</script>
+  <script type="text/javascript" src="/static/configuration/configuration.d37b7a4733ed4923d330.js?6748e9d7a27dcdcef92e"></script></body>
 </html>
