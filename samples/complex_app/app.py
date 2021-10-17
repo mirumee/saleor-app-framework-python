@@ -1,15 +1,14 @@
-import os
-
-import uvicorn
-from configuration_endpoints import router
-from db import configuration, get_db
-from settings import settings
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from webhooks import webhook_handlers
 
 from saleor_app.app import SaleorApp
 from saleor_app.schemas.core import DomainName, WebhookData
+
+from .configuration_endpoints import router as configuration_router
+from .db import configuration, get_db
+from .extension import router as extension_router
+from .settings import settings
+from .webhooks import webhook_handlers
 
 
 async def validate_domain(domain_name: DomainName) -> bool:
@@ -43,7 +42,8 @@ app = SaleorApp(
     webhook_handlers=webhook_handlers,
     get_webhook_details=get_webhook_details,
 )
-app.configuration_router.include_router(router)
+app.configuration_router.include_router(configuration_router)
+app.include_router(extension_router, prefix="/products")
 app.include_saleor_app_routes()
 
 app.add_middleware(
@@ -53,8 +53,3 @@ app.add_middleware(
     allow_methods=["OPTIONS", "GET", "POST"],
 )
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
-
-
-if __name__ == "__main__":
-    os.environ["APP_SETTINGS"] = "app.settings"
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, debug=True, reload=True)

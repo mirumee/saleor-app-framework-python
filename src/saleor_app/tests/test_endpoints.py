@@ -1,3 +1,4 @@
+import json
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -14,6 +15,7 @@ from saleor_app.deps import (
     webhook_event_type,
 )
 from saleor_app.schemas.handlers import WebhookHandlers
+from saleor_app.schemas.manifest import Manifest
 from saleor_app.tests.sample_app import store_app_data
 
 
@@ -25,7 +27,10 @@ async def test_manifest(app):
     base_url = "http://test"
     manifest["appUrl"] = ""
     manifest["tokenTargetUrl"] = f"{base_url}/configuration/install"
-    manifest["configurationUrl"] = f"{base_url}/configuration/"
+    manifest["configurationUrl"] = f"{base_url}/configuration"
+    manifest["extensions"][0]["url"] = f"{base_url}/extension"
+
+    manifest = json.loads(json.dumps(Manifest(**manifest).dict(by_alias=True)))
 
     async with AsyncClient(app=app, base_url=base_url) as ac:
         response = await ac.get("configuration/manifest")
@@ -54,7 +59,7 @@ async def test_install(app, monkeypatch):
         "example.com",
         "saleor-app-token",
         ["product_created", "product_updated", "product_deleted"],
-        "http://test/webhook/",
+        "http://test/webhook",
         store_app_data,
     )
 

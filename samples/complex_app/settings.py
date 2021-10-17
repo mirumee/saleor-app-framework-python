@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from saleor_app.conf import Settings, SettingsManifest
+from saleor_app.schemas.core import SaleorPermissions
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -24,7 +25,23 @@ settings = AppSettings(
         homepage_url="http://172.17.0.1:5000/homepageUrl",
         support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-complex-sample",
-        permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+        permissions=[
+            SaleorPermissions.MANAGE_PRODUCTS,
+            SaleorPermissions.MANAGE_USERS,
+        ],
+        configuration_url_for="configuration-form",
+        extensions=[
+            {
+                "url_for": "custom-add-product",
+                "label": "Custom Product Create",
+                "view": "PRODUCT",
+                "type": "OVERVIEW",
+                "target": "CREATE",
+                "permissions": [
+                    SaleorPermissions.MANAGE_PRODUCTS,
+                ],
+            }
+        ],
     ),
     dev_saleor_domain="127.0.0.1:5000",
     dev_saleor_token="test_token",

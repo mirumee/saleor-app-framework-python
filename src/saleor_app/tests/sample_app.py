@@ -7,7 +7,7 @@ from starlette.staticfiles import StaticFiles
 
 from saleor_app.app import SaleorApp
 from saleor_app.conf import get_settings
-from saleor_app.endpoints import get_form
+from saleor_app.endpoints import get_public_form
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
 
@@ -47,6 +47,10 @@ async def product_deleted(payload: Payload, saleor_domain: DomainName):
     ...
 
 
+async def extension():
+    ...
+
+
 def get_app():
     webhook_handlers = WebhookHandlers(
         product_created=product_created,
@@ -62,9 +66,9 @@ def get_app():
         get_webhook_details=get_webhook_details,
     )
     app.configuration_router.get(
-        "/", response_class=HTMLResponse, name="configuration-form"
-    )(get_form)
-
+        "", response_class=HTMLResponse, name="configuration-form"
+    )(get_public_form)
+    app.get("/extension", name="extension")(extension)
     app.include_saleor_app_routes()
     app.add_middleware(
         CORSMiddleware,

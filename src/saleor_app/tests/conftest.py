@@ -10,9 +10,11 @@ from saleor_app.tests.sample_app import get_app
 def app_settings_env():
     os.environ["APP_SETTINGS"] = "saleor_app.tests.sample_settings.test_app_settings"
 
+
 @pytest.fixture()
 def clear_settings_cache():
     get_settings.cache_clear()
+
 
 @pytest.fixture
 def app(clear_settings_cache):

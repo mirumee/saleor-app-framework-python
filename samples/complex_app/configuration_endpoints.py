@@ -1,10 +1,10 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 from fastapi.param_functions import Depends
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 
 from saleor_app.deps import ConfigurationDataDeps
-from saleor_app.endpoints import get_form
+from saleor_app.endpoints import get_public_form
 
 
 class ConfigurationData(BaseModel):
@@ -15,7 +15,7 @@ class ConfigurationData(BaseModel):
 router = APIRouter()
 
 
-router.get("/", response_class=HTMLResponse, name="configuration-form")(get_form)
+router.get("/", response_class=HTMLResponse, name="configuration-form")(get_public_form)
 
 
 @router.get("/data")

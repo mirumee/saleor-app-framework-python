@@ -4,7 +4,7 @@ import logging
 from typing import List
 
 import jwt
-from fastapi import Depends, Header, HTTPException, Request
+from fastapi import Depends, Header, HTTPException, Query, Request
 
 from saleor_app.conf import Settings, get_settings
 from saleor_app.schemas.core import DomainName
@@ -153,13 +153,11 @@ class ConfigurationFormDeps:
     def __init__(
         self,
         request: Request,
-        saleor_domain=Depends(saleor_domain_header),
-        token=Depends(saleor_token),
+        domain=Query(...),
         settings: Settings = Depends(get_settings),
     ):
         self.request = request
-        self.saleor_domain = saleor_domain
-        self.token = token
+        self.saleor_domain = domain
         self.settings = settings
 
 
@@ -170,6 +168,8 @@ class ConfigurationDataDeps:
         saleor_domain=Depends(saleor_domain_header),
         _domain_is_valid=Depends(verify_saleor_domain),
         _token_is_valid=Depends(verify_saleor_token),
+        token=Depends(saleor_token),
     ):
         self.request = request
         self.saleor_domain = saleor_domain
+        self.token = token

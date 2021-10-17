@@ -12,6 +12,19 @@ manifest = SettingsManifest(
     support_url="127.0.0.1:8888/app-info/support",
     id="sample-app",
     permissions=[],
+    configuration_url_for="configuration-form",
+    extensions=[
+        {
+            "url_for": "extension",
+            "label": "Custom Product Create",
+            "view": "PRODUCT",
+            "type": "OVERVIEW",
+            "target": "CREATE",
+            "permissions": [
+                "MANAGE_PRODUCTS",
+            ],
+        }
+    ],
 )
 
 test_app_settings = Settings(

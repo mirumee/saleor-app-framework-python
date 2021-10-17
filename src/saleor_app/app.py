@@ -54,5 +54,5 @@ class SaleorApp(FastAPI):
                 404: {"description": "Incorrect saleor event"},
             },
         )
-        router.post("/", name="handle-webhook")(handle_webhook)
+        router.post("", name="handle-webhook")(handle_webhook)
         self.include_router(router)

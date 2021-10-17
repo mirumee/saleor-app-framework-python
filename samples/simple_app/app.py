@@ -1,7 +1,5 @@
-import os
 from pathlib import Path
 
-import uvicorn
 from fastapi.param_functions import Depends
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -11,7 +9,7 @@ from starlette.staticfiles import StaticFiles
 from saleor_app.app import SaleorApp
 from saleor_app.conf import Settings, SettingsManifest
 from saleor_app.deps import ConfigurationDataDeps
-from saleor_app.endpoints import get_form
+from saleor_app.endpoints import get_public_form
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
 
@@ -33,6 +31,8 @@ settings = Settings(
         support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-simple-sample",
         permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+        configuration_url_for="configuration-form",
+        extensions=[],
     ),
     dev_saleor_domain="127.0.0.1:5000",
     dev_saleor_token="test_token",
@@ -92,7 +92,7 @@ app = SaleorApp(
 )
 app.configuration_router.get(
     "/", response_class=HTMLResponse, name="configuration-form"
-)(get_form)
+)(get_public_form)
 
 
 @app.configuration_router.get("/data")
@@ -110,8 +110,3 @@ app.add_middleware(
     allow_methods=["OPTIONS", "GET", "POST"],
 )
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
-
-
-if __name__ == "__main__":
-    os.environ["APP_SETTINGS"] = "app.settings"
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, debug=True, reload=True)

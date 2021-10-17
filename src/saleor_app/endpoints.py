@@ -24,7 +24,11 @@ async def manifest(request: Request, settings=Depends(get_settings)):
     manifest = settings.manifest.dict(by_alias=True)
     manifest["appUrl"] = ""
     manifest["tokenTargetUrl"] = request.url_for("app-install")
-    manifest["configurationUrl"] = request.url_for("configuration-form")
+    manifest["configurationUrl"] = request.url_for(
+        manifest.pop("configuration_url_for")
+    )
+    for extension in manifest["extensions"]:
+        extension["url"] = request.url_for(extension.pop("url_for"))
     return Manifest(**manifest)
 
 
@@ -68,12 +72,11 @@ async def handle_webhook(
     return response or {}
 
 
-async def get_form(commons: ConfigurationFormDeps = Depends()):
+async def get_public_form(commons: ConfigurationFormDeps = Depends()):
     context = {
         "request": commons.request,
         "form_url": commons.request.url,
         "domain": commons.saleor_domain,
-        "token": commons.token,
     }
     return Jinja2Templates(directory=str(commons.settings.static_dir)).TemplateResponse(
         "configuration/index.html", context
