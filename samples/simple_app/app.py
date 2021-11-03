@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Dict, Optional
 
 import uvicorn
 from fastapi.param_functions import Depends
@@ -16,6 +17,7 @@ from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import Payload, WebhookHandlers
 
 PROJECT_DIR = Path(__file__).parent
+WEBHOOK_STORAGE: Dict[DomainName, WebhookData] = dict()
 
 settings = Settings(
     app_name="SimpleApp",
@@ -49,17 +51,14 @@ async def validate_domain(domain_name: DomainName) -> bool:
 
 
 async def store_app_data(domain_name: DomainName, app_data: WebhookData):
+    WEBHOOK_STORAGE[domain_name] = app_data
     print("Called store_app_data")
     print(domain_name)
     print(app_data)
 
 
-async def get_webhook_details(domain_name: DomainName) -> WebhookData:
-    return WebhookData(
-        token="auth-token",
-        webhook_id="webhook-id",
-        webhook_secret_key="webhook-secret-key",
-    )
+async def get_webhook_details(domain_name: DomainName) -> Optional[WebhookData]:
+    return WEBHOOK_STORAGE.get(domain_name, None)
 
 
 async def product_created(payload: Payload, saleor_domain: DomainName):
