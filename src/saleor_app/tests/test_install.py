@@ -67,6 +67,37 @@ async def test_install_app(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_install_app_failed_when_already_installed():
+    get_webhook_details_mock = AsyncMock(
+        WebhookData(
+            token="auth-token",
+            webhook_id="webhook-id",
+            webhook_secret_key="webhook-secret-key",
+        )
+    )
+    mocked_executor = AsyncMock()
+    save_app_data_fun = AsyncMock()
+
+    events = ["ORDER_CREATED", "PRODUCT_CREATED"]
+    target_url = "saleor.io/app/webhook-url"
+    saleor_store_domain = "saleor.io"
+    saleor_app_token = "saleor-token"
+
+    with pytest.raises(InstallAppError):
+        await install_app(
+            domain=saleor_store_domain,
+            token=saleor_app_token,
+            events=events,
+            target_url=target_url,
+            save_app_data=save_app_data_fun,
+            get_webhook_details=get_webhook_details_mock,
+        )
+    get_webhook_details_mock.assert_awaited_once_with(saleor_store_domain)
+    assert not mocked_executor.called
+    assert not save_app_data_fun.called
+
+
+@pytest.mark.asyncio
 async def test_install_app_graphql_error(monkeypatch):
     json_failed_response = {
         "errors": [

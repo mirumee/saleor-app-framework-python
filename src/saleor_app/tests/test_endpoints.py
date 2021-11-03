@@ -63,6 +63,19 @@ async def test_install(app, monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_install_failed_when_app_already_installed(app):
+    app.dependency_overrides[verify_saleor_domain] = lambda: True
+    base_url, saleor_domain = "http://test", "example.com"
+    async with AsyncClient(app=app, base_url=base_url) as ac:
+        response = await ac.post(
+            "configuration/install",
+            json={"auth_token": "saleor-app-token"},
+            headers={SALEOR_DOMAIN_HEADER: saleor_domain},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_install_failed_installation(app, monkeypatch):
     app.dependency_overrides[verify_saleor_domain] = lambda: True
     app.dependency_overrides[saleor_domain_header] = lambda: "not-installed-example.com"
