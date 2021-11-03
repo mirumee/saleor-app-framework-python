@@ -29,6 +29,7 @@ async def test_install_app(monkeypatch):
     monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
 
     save_app_data_fun = AsyncMock()
+    get_webhook_details_mock = AsyncMock(return_value=None)
 
     events = ["ORDER_CREATED", "PRODUCT_CREATED"]
     target_url = "saleor.io/app/webhook-url"
@@ -41,6 +42,7 @@ async def test_install_app(monkeypatch):
         events=events,
         target_url=target_url,
         save_app_data=save_app_data_fun,
+        get_webhook_details=get_webhook_details_mock,
     )
 
     expected_secret_key = "a" * 20
@@ -52,8 +54,8 @@ async def test_install_app(monkeypatch):
             "secretKey": expected_secret_key,
         }
     }
+    get_webhook_details_mock.assert_awaited_once_with(saleor_store_domain)
     mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
-
     save_app_data_fun.assert_awaited_once_with(
         saleor_store_domain,
         WebhookData(
@@ -91,6 +93,7 @@ async def test_install_app_graphql_error(monkeypatch):
     monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
 
     save_app_data_fun = AsyncMock()
+    get_webhook_details_mock = AsyncMock(return_value=None)
 
     events = ["ORDER_CREATED", "PRODUCT_CREATED"]
     target_url = "saleor.io/app/webhook-url"
@@ -104,6 +107,7 @@ async def test_install_app_graphql_error(monkeypatch):
             events=events,
             target_url=target_url,
             save_app_data=save_app_data_fun,
+            get_webhook_details=get_webhook_details_mock,
         )
 
     expected_secret_key = "a" * 20
@@ -115,6 +119,7 @@ async def test_install_app_graphql_error(monkeypatch):
             "secretKey": expected_secret_key,
         }
     }
+    get_webhook_details_mock.assert_awaited_once_with(saleor_store_domain)
     mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
 
     assert not save_app_data_fun.called
@@ -150,6 +155,7 @@ async def test_install_app_mutation_error(monkeypatch):
     monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
 
     save_app_data_fun = AsyncMock()
+    get_webhook_details_mock = AsyncMock(return_value=None)
 
     events = ["ORDER_CREATED", "PRODUCT_CREATED"]
     target_url = "saleor.io/app/webhook-url"
@@ -163,6 +169,7 @@ async def test_install_app_mutation_error(monkeypatch):
             events=events,
             target_url=target_url,
             save_app_data=save_app_data_fun,
+            get_webhook_details=get_webhook_details_mock,
         )
 
     expected_secret_key = "a" * 20
@@ -174,6 +181,7 @@ async def test_install_app_mutation_error(monkeypatch):
             "secretKey": expected_secret_key,
         }
     }
+    get_webhook_details_mock.assert_awaited_once_with(saleor_store_domain)
     mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
 
     assert not save_app_data_fun.called

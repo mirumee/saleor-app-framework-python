@@ -28,6 +28,8 @@ async def store_app_data(domain_name: DomainName, app_data: WebhookData):
 
 
 async def get_webhook_details(domain_name: DomainName):
+    if domain_name != "example.com":
+        return None
     return WebhookData(
         token="auth-token",
         webhook_id="webhook-id",

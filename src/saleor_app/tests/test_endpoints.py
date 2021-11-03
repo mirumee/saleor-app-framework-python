@@ -14,7 +14,7 @@ from saleor_app.deps import (
     webhook_event_type,
 )
 from saleor_app.schemas.handlers import WebhookHandlers
-from saleor_app.tests.sample_app import store_app_data
+from saleor_app.tests.sample_app import get_webhook_details, store_app_data
 
 
 @pytest.mark.asyncio
@@ -56,6 +56,7 @@ async def test_install(app, monkeypatch):
         ["product_created", "product_updated", "product_deleted"],
         "http://test/webhook/",
         store_app_data,
+        get_webhook_details,
     )
 
     assert validate_domain_mock.called
@@ -64,7 +65,7 @@ async def test_install(app, monkeypatch):
 @pytest.mark.asyncio
 async def test_install_failed_installation(app, monkeypatch):
     app.dependency_overrides[verify_saleor_domain] = lambda: True
-    app.dependency_overrides[saleor_domain_header] = lambda: "example.com"
+    app.dependency_overrides[saleor_domain_header] = lambda: "not-installed-example.com"
 
     json_failed_response = {
         "data": {
