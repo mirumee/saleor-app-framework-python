@@ -1,9 +1,11 @@
 import os
+from typing import Optional
 
 import uvicorn
 from configuration_endpoints import router
 from db import configuration, get_db
 from settings import settings
+from sqlalchemy.orm.exc import NoResultFound
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 from webhooks import webhook_handlers
@@ -29,12 +31,18 @@ async def store_app_data(domain_name: DomainName, app_data: WebhookData):
     db.commit()
 
 
-async def get_webhook_details(domain_name: DomainName) -> WebhookData:
-    return WebhookData(
-        token="auth-token",
-        webhook_id="webhook-id",
-        webhook_secret_key="webhook-secret-key",
-    )
+async def get_webhook_details(domain_name: DomainName) -> Optional[WebhookData]:
+    query = configuration.select().where(configuration.c.domain_name == domain_name)
+    db = next(get_db())
+    try:
+        result = db.execute(query).one()
+        return WebhookData(
+            token=result.webhook_token,
+            webhook_id=result.webhook_id,
+            webhook_secret_key=result.webhook_secret,
+        )
+    except NoResultFound:
+        return None
 
 
 app = SaleorApp(
