@@ -44,10 +44,12 @@ async def install(
             request.app.extra["saleor"]["webhook_handlers"].get_assigned_events(),
             target_url,
             request.app.extra["saleor"]["save_app_data"],
+            request.app.extra["saleor"]["get_webhook_details"],
         )
     except (InstallAppError, GraphQLError):
         raise HTTPException(
-            status_code=403, detail="Incorrect token or not enough permissions"
+            status_code=403,
+            detail="Incorrect token, not enough permissions or app already installed",
         )
 
     return {}

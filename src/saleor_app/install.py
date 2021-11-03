@@ -18,7 +18,12 @@ async def install_app(
     events: List[str],
     target_url: Url,
     save_app_data: Callable[[DomainName, WebhookData], Awaitable],
+    get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
 ):
+    webhook_details = await get_webhook_details(domain)
+    if webhook_details:
+        raise InstallAppError("App is already installed for %s.", domain)
+
     alphabet = string.ascii_letters + string.digits
     secret_key = "".join(secrets.choice(alphabet) for _ in range(20))
 

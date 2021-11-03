@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Optional
 
 from fastapi import APIRouter, FastAPI
 
@@ -15,7 +15,7 @@ class SaleorApp(FastAPI):
         validate_domain: Callable[[DomainName], Awaitable[bool]],
         save_app_data: Callable[[DomainName, WebhookData], Awaitable],
         webhook_handlers: WebhookHandlers,
-        get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
+        get_webhook_details: Callable[[DomainName], Awaitable[Optional[WebhookData]]],
         **kwargs,
     ):
         super().__init__(**kwargs)
