@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -35,8 +35,8 @@ async def test_get_executor(monkeypatch, settings):
     settings.debug = False
     api_response = {"data": {"user": {"email": "admin@example.com"}}}
     response = AsyncMock()
-    response.json.return_value = api_response
-    request = AsyncMock(return_value=response)
+    response.__aenter__.return_value.json.return_value = api_response
+    request = MagicMock(return_value=response)
     monkeypatch.setattr("saleor_app.graphql.ClientSession.request", request)
     api_url = get_saleor_api_url("localhost:8000")
     executor = get_executor(host=api_url, auth_token="saleor-token")
@@ -48,7 +48,7 @@ async def test_get_executor(monkeypatch, settings):
         }
     """
     await executor(user_query, variables={"id": "user-id"})
-    request.assert_awaited_once_with(
+    request.assert_called_once_with(
         "POST",
         url="https://localhost:8000/graphql/",
         json={"query": user_query, "variables": {"id": "user-id"}},
@@ -62,8 +62,8 @@ async def test_get_executor_returns_json_response(monkeypatch, settings):
     settings.debug = False
     api_response = {"data": {"user": {"email": "admin@example.com"}}}
     response = AsyncMock()
-    response.json.return_value = api_response
-    request = AsyncMock(return_value=response)
+    response.__aenter__.return_value.json.return_value = api_response
+    request = MagicMock(return_value=response)
     monkeypatch.setattr("saleor_app.graphql.ClientSession.request", request)
     api_url = get_saleor_api_url("localhost:8000")
     executor = get_executor(host=api_url, auth_token="saleor-token")
@@ -76,7 +76,7 @@ async def test_get_executor_returns_json_response(monkeypatch, settings):
     """
     response, _errors = await executor(user_query, variables={"id": "user-id"})
 
-    request.assert_awaited_once_with(
+    request.assert_called_once_with(
         "POST",
         url="https://localhost:8000/graphql/",
         json={"query": user_query, "variables": {"id": "user-id"}},
