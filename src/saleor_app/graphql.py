@@ -46,24 +46,20 @@ async def _execute_query(host, api_key, timeout, query, variables=None, file=Non
 
     async with ClientSession() as client:
         try:
-            response = await client.request(
-                "POST",
-                url=host,
-                json=data,
-                headers=headers,
-                timeout=timeout,
-                **kwargs,
-            )
+            async with client.request(
+                "POST", url=host, json=data, headers=headers, timeout=timeout, **kwargs
+            ) as response:
+                try:
+                    result = await response.json()
+                    errors = result.get("errors")
+                    if errors:
+                        logger.warning(
+                            "Query to the server has returned an error.", extra=errors
+                        )
+                except json.JSONDecodeError as e:
+                    logger.exception(msg=f"FAILED RESPONSE: {response}", exc_info=e)
+                    raise GraphQLError(e)
+                return result, errors
         except ClientError as e:
             logger.exception(msg="Connection error", exc_info=e)
             raise GraphQLError(e)
-
-    try:
-        result = await response.json()
-        errors = result.get("errors")
-        if errors:
-            logger.warning("Query to the server has returned an error.", extra=errors)
-    except json.JSONDecodeError as e:
-        logger.exception(msg=f"FAILED RESPONSE: {response}", exc_info=e)
-        raise GraphQLError(e)
-    return result, errors
