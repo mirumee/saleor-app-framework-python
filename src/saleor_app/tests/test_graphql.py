@@ -34,10 +34,11 @@ def test_get_saleor_api_url(settings):
 async def test_get_executor(monkeypatch, settings):
     settings.debug = False
     api_response = {"data": {"user": {"email": "admin@example.com"}}}
-    response = AsyncMock()
-    response.__aenter__.return_value.json.return_value = api_response
-    request = MagicMock(return_value=response)
-    monkeypatch.setattr("saleor_app.graphql.ClientSession.request", request)
+    request = AsyncMock()
+    async with request as response:
+        response.json.return_value = api_response
+    session = MagicMock(return_value=request)
+    monkeypatch.setattr("saleor_app.graphql.ClientSession.request", session)
     api_url = get_saleor_api_url("localhost:8000")
     executor = get_executor(host=api_url, auth_token="saleor-token")
     user_query = """
@@ -48,7 +49,7 @@ async def test_get_executor(monkeypatch, settings):
         }
     """
     await executor(user_query, variables={"id": "user-id"})
-    request.assert_called_once_with(
+    session.assert_called_once_with(
         "POST",
         url="https://localhost:8000/graphql/",
         json={"query": user_query, "variables": {"id": "user-id"}},
@@ -61,10 +62,11 @@ async def test_get_executor(monkeypatch, settings):
 async def test_get_executor_returns_json_response(monkeypatch, settings):
     settings.debug = False
     api_response = {"data": {"user": {"email": "admin@example.com"}}}
-    response = AsyncMock()
-    response.__aenter__.return_value.json.return_value = api_response
-    request = MagicMock(return_value=response)
-    monkeypatch.setattr("saleor_app.graphql.ClientSession.request", request)
+    request = AsyncMock()
+    async with request as response:
+        response.json.return_value = api_response
+    session = MagicMock(return_value=request)
+    monkeypatch.setattr("saleor_app.graphql.ClientSession.request", session)
     api_url = get_saleor_api_url("localhost:8000")
     executor = get_executor(host=api_url, auth_token="saleor-token")
     user_query = """
@@ -76,7 +78,7 @@ async def test_get_executor_returns_json_response(monkeypatch, settings):
     """
     response, _errors = await executor(user_query, variables={"id": "user-id"})
 
-    request.assert_called_once_with(
+    session.assert_called_once_with(
         "POST",
         url="https://localhost:8000/graphql/",
         json={"query": user_query, "variables": {"id": "user-id"}},
