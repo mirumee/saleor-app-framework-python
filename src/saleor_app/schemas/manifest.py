@@ -1,7 +1,8 @@
 from enum import Enum
-from typing import List, Optional
+from typing import Callable, List, Union
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import AnyHttpUrl, BaseModel, Field, root_validator
+from starlette.requests import Request
 
 
 class ViewType(str, Enum):
@@ -18,48 +19,55 @@ class TargetType(str, Enum):
     CREATE = "CREATE"
 
 
-class BaseExtension(BaseModel):
+class Extension(BaseModel):
     label: str
     view: ViewType
     type: ExtensionType
     target: TargetType
     permissions: List[str]
+    url: Union[AnyHttpUrl, Callable[[str], str]]
 
     class Config:
         allow_population_by_field_name = True
 
 
-class SettingsExtension(BaseExtension):
-    url_for: str
-
-
-class Extension(BaseExtension):
-    url: AnyHttpUrl
-
-
-class BaseSettingsManifest(BaseModel):
+class Manifest(BaseModel):
+    id: str
+    permissions: List[str]
     name: str
     version: str
     about: str
+    extensions: List[Extension]
     data_privacy: str = Field(..., alias="dataPrivacy")
-    data_privacy_url: str = Field(..., alias="dataPrivacyUrl")
-    homepage_url: str = Field(..., alias="homepageUrl")
-    support_url: str = Field(..., alias="supportUrl")
-    id: str
-    permissions: List[str]
-    app_url: Optional[str] = Field(default=None, alias="appUrl")
-    extensions: List[SettingsExtension]
+    data_privacy_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
+        ..., alias="dataPrivacyUrl"
+    )
+    homepage_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
+        ..., alias="homepageUrl"
+    )
+    support_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
+        ..., alias="supportUrl"
+    )
+    configuration_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
+        ..., alias="configurationUrl"
+    )
+    app_url: Union[AnyHttpUrl, Callable[[str], str]] = Field("", alias="appUrl")
+    token_target_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
+        ..., alias="tokenTargetUrl"
+    )
 
     class Config:
         allow_population_by_field_name = True
 
+    @staticmethod
+    def url_for(name: str):
+        def resolve(request: Request):
+            return request.url_for(name=name)
 
-class SettingsManifest(BaseSettingsManifest):
-    configuration_url_for: str
+        return resolve
 
-
-class Manifest(BaseSettingsManifest):
-    app_url: str = Field(..., alias="appUrl")
-    configuration_url: str = Field(..., alias="configurationUrl")
-    token_target_url: str = Field(..., alias="tokenTargetUrl")
-    extensions: List[Extension]
+    @root_validator(pre=True)
+    def default_token_target_url(cls, values):
+        if not values.get("token_target_url"):
+            values["token_target_url"] = cls.url_for("app-install")
+        return values

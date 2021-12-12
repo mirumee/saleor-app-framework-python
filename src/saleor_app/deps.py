@@ -6,25 +6,21 @@ from typing import List
 import jwt
 from fastapi import Depends, Header, HTTPException, Query, Request
 
-from saleor_app.conf import Settings, get_settings
+from saleor_app.saleor.exceptions import GraphQLError
+from saleor_app.saleor.mutations import VERIFY_TOKEN
+from saleor_app.saleor.utils import get_client_for_app
 from saleor_app.schemas.core import DomainName
-from saleor_app.schemas.handlers import WebhookHandlers
-from saleor_app.validators import verify_token
 
 logger = logging.getLogger(__name__)
 
 SALEOR_DOMAIN_HEADER = "x-saleor-domain"
 SALEOR_TOKEN_HEADER = "x-saleor-token"
-SALEOR_EVENT_HEADER = "x-saleor-event"
 SALEOR_SIGNATURE_HEADER = "x-saleor-signature"
 
 
 async def saleor_domain_header(
     saleor_domain=Header(None, alias=SALEOR_DOMAIN_HEADER),
-    settings: Settings = Depends(get_settings),
 ) -> DomainName:
-    if settings.debug:
-        saleor_domain = saleor_domain or settings.dev_saleor_domain
     if not saleor_domain:
         logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header.")
         raise HTTPException(
@@ -34,11 +30,11 @@ async def saleor_domain_header(
 
 
 async def saleor_token(
+    request: Request,
     token=Header(None, alias=SALEOR_TOKEN_HEADER),
-    settings: Settings = Depends(get_settings),
 ) -> str:
-    if settings.debug:
-        token = token or settings.dev_saleor_token
+    if request.app.development_auth_token:
+        token = token or request.app.development_auth_token
     if not token:
         logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(
@@ -48,9 +44,29 @@ async def saleor_token(
 
 
 async def verify_saleor_token(
-    domain=Depends(saleor_domain_header), token=Depends(saleor_token)
+    request: Request,
+    saleor_domain=Depends(saleor_domain_header),
+    token=Depends(saleor_token),
 ) -> bool:
-    is_valid = await verify_token(domain, token)
+    schema = "http" if request.app.use_insecure_saleor_http else "https"
+    async with get_client_for_app(
+        f"{schema}://{saleor_domain}", manifest=request.app.manifest
+    ) as saleor:
+        try:
+            response = saleor.execute(
+                VERIFY_TOKEN,
+                variables={
+                    "token": token,
+                },
+            )
+        except GraphQLError:
+            return False
+
+    try:
+        is_valid = response["tokenVerify"]["isValid"] is True
+    except KeyError:
+        is_valid = False
+
     if not is_valid:
         logger.warning(
             f"Provided {SALEOR_DOMAIN_HEADER.upper()} and "
@@ -79,28 +95,6 @@ async def verify_saleor_domain(
             status_code=400, detail=f"Provided domain {saleor_domain} is invalid."
         )
     return True
-
-
-async def webhook_event_type(event=Header(None, alias=SALEOR_EVENT_HEADER)) -> str:
-    if not event:
-        logger.warning(f"Missing {SALEOR_EVENT_HEADER.upper()} header.")
-        raise HTTPException(
-            status_code=400, detail=f"Missing {SALEOR_EVENT_HEADER.upper()} header."
-        )
-    if event not in WebhookHandlers.__fields__:
-        logger.error(
-            "Event from %s header %s doesn't have own handler.",
-            SALEOR_EVENT_HEADER,
-            event,
-        )
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                f"Event from {SALEOR_EVENT_HEADER} header {event} doesn't have own "
-                "handler on the app side."
-            ),
-        )
-    return event
 
 
 async def verify_webhook_signature(
@@ -133,18 +127,26 @@ async def verify_webhook_signature(
 
 
 def require_permission(permissions: List):
+    """
+    Validates is the requesting principal is authorized for the specified action
+
+    Usage:
+
+    ```
+    Depends(require_permission([SaleorPermissions.MANAGE_PRODUCTS]))
+    ```
+    """
+
     async def func(
         saleor_domain=Depends(saleor_domain_header),
         saleor_token=Depends(saleor_token),
-        # TODO: this needs to happen but there's hope that Saleor will go with
-        # an RS JWT sign.
-        # _token_is_valid=Depends(verify_saleor_token),
+        _token_is_valid=Depends(verify_saleor_token),
     ):
         jwt_payload = jwt.decode(saleor_token, verify=False)
         user_permissions = set(jwt_payload.get("permissions", []))
         if not set([p.value for p in permissions]) - user_permissions:
             return True
-        raise Exception("Unauthorized user")
+        raise HTTPException(status_code=403, detail="Unauthorized user")
 
     return func
 
@@ -154,11 +156,9 @@ class ConfigurationFormDeps:
         self,
         request: Request,
         domain=Query(...),
-        settings: Settings = Depends(get_settings),
     ):
         self.request = request
         self.saleor_domain = domain
-        self.settings = settings
 
 
 class ConfigurationDataDeps:

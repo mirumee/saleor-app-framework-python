@@ -1,10 +1,2 @@
-class GraphQLBaseError(Exception):
-    pass
-
-
-class GraphQLError(GraphQLBaseError):
-    """GraphQL Error"""
-
-
-class InstallAppError(GraphQLBaseError):
+class InstallAppError(Exception):
     """Install App error"""

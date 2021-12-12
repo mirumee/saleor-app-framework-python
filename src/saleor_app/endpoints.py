@@ -1,35 +1,33 @@
-from typing import Any, List
+import json
+from typing import List
 
-from fastapi import Request
+from fastapi import Depends, Header, Request
 from fastapi.exceptions import HTTPException
-from fastapi.param_functions import Depends
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import PlainTextResponse
 
 from saleor_app.deps import (
     ConfigurationFormDeps,
-    get_settings,
     saleor_domain_header,
     verify_saleor_domain,
-    verify_webhook_signature,
-    webhook_event_type,
 )
 from saleor_app.errors import InstallAppError
-from saleor_app.graphql import GraphQLError
+from saleor_app.http import SALEOR_EVENT_HEADER
 from saleor_app.install import install_app
+from saleor_app.saleor.exceptions import GraphQLError
 from saleor_app.schemas.core import InstallData
-from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.webhook import Webhook
 
 
-async def manifest(request: Request, settings=Depends(get_settings)):
-    manifest = settings.manifest.dict(by_alias=True)
-    manifest["appUrl"] = ""
-    manifest["tokenTargetUrl"] = request.url_for("app-install")
-    manifest["configurationUrl"] = request.url_for(
-        manifest.pop("configuration_url_for")
-    )
-    for extension in manifest["extensions"]:
-        extension["url"] = request.url_for(extension.pop("url_for"))
-    return Manifest(**manifest)
+async def manifest(request: Request):
+    manifest = request.app.manifest
+    for name, field in manifest:
+        if callable(field):
+            setattr(manifest, name, field(request))
+    for extension in manifest.extensions:
+        if callable(extension.url):
+            extension.url = extension.url(request)
+    manifest.app_url = "http://127.0.0.1"
+    return manifest
 
 
 async def install(
@@ -38,16 +36,15 @@ async def install(
     _domain_is_valid=Depends(verify_saleor_domain),
     saleor_domain=Depends(saleor_domain_header),
 ):
-    target_url = request.url_for("handle-webhook")
-    domain = saleor_domain
-    auth_token = data.auth_token
     try:
         await install_app(
-            domain,
-            auth_token,
-            request.app.extra["saleor"]["webhook_handlers"].get_assigned_events(),
-            target_url,
-            request.app.extra["saleor"]["save_app_data"],
+            saleor_domain=saleor_domain,
+            auth_token=data.auth_token,
+            manifest=request.app.manifest,
+            events=request.app.webhook_handlers.get_assigned_events(),
+            target_url=request.url_for("handle-webhook"),
+            save_app_data_callback=request.app.extra["saleor"]["save_app_data"],
+            use_insecure_saleor_http=request.app.use_insecure_saleor_http,
         )
     except (InstallAppError, GraphQLError):
         raise HTTPException(
@@ -59,25 +56,17 @@ async def install(
 
 async def handle_webhook(
     request: Request,
-    payload: List[Any],  # FIXME provide a way to proper define payload types
-    _domain_is_valid=Depends(verify_saleor_domain),
+    payload: List[Webhook],  # FIXME provide a way to proper define payload types
     saleor_domain=Depends(saleor_domain_header),
-    event_type=Depends(webhook_event_type),
-    _signature_is_valid=Depends(verify_webhook_signature),
+    _event_type=Header(None, alias=SALEOR_EVENT_HEADER),
 ):
-    response = {}
-    handler = request.app.extra["saleor"]["webhook_handlers"].get(event_type)
-    if handler is not None:
-        response = await handler(payload, saleor_domain)
-    return response or {}
+    return {}
 
 
 async def get_public_form(commons: ConfigurationFormDeps = Depends()):
     context = {
-        "request": commons.request,
-        "form_url": commons.request.url,
-        "domain": commons.saleor_domain,
+        "request": str(commons.request),
+        "form_url": str(commons.request.url),
+        "saleor_domain": commons.saleor_domain,
     }
-    return Jinja2Templates(directory=str(commons.settings.static_dir)).TemplateResponse(
-        "configuration/index.html", context
-    )
+    return PlainTextResponse(json.dumps(context, indent=4))
