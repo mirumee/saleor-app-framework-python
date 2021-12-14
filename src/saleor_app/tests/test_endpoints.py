@@ -281,7 +281,7 @@ async def test_handle_webhook(app):
     validate_domain_mock = AsyncMock(return_value=True)
     app.extra["saleor"]["validate_domain"] = validate_domain_mock
 
-    app.extra["saleor"]["webhook_handlers"] = WebhookHandlers(
+    app.extra["saleor"]["http_webhook_handlers"] = WebhookHandlers(
         product_created=product_created_mock,
         product_updated=product_updated_mock,
     )

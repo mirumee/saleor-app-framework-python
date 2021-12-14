@@ -5,10 +5,12 @@ from fastapi.routing import APIRoute
 
 from saleor_app.deps import verify_saleor_domain, verify_webhook_signature
 from saleor_app.endpoints import handle_webhook, install, manifest
+from saleor_app.errors import ConfigurationError
 from saleor_app.http import WebhookRoute
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
+from saleor_app.settings import SaleorAppSettings
 
 
 class SaleorApp(FastAPI):
@@ -18,18 +20,22 @@ class SaleorApp(FastAPI):
         manifest: Manifest,
         validate_domain: Callable[[DomainName], Awaitable[bool]],
         save_app_data: Callable[[DomainName, WebhookData], Awaitable],
-        webhook_handlers: WebhookHandlers,
         get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
-        use_insecure_saleor_http: bool = False,
-        development_auth_token: Optional[str] = None,
+        app_settings: SaleorAppSettings,
+        http_webhook_handlers: Optional[WebhookHandlers] = None,
+        sqs_webhook_handlers: Optional[WebhookHandlers] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
 
         self.manifest = manifest
-        self.webhook_handlers = webhook_handlers
-        self.use_insecure_saleor_http = use_insecure_saleor_http
-        self.development_auth_token = development_auth_token
+        self.http_webhook_handlers = http_webhook_handlers
+        self.sqs_webhook_handlers = sqs_webhook_handlers
+        self.app_settings = app_settings
+        if self.sqs_webhook_handlers and not app_settings.aws:
+            raise ConfigurationError(
+                "To leverage SQS webhook handlers you must provide settings.aws"
+            )
 
         self.extra["saleor"] = {
             "validate_domain": validate_domain,
@@ -74,9 +80,9 @@ class SaleorApp(FastAPI):
         self.webhook_handler_routes = {
             name: APIRoute(
                 "",
-                endpoint,
+                handler,
             )
-            for name, endpoint in self.webhook_handlers
-            if endpoint
+            for name, handler in self.http_webhook_handlers
+            if handler
         }
         self.include_router(router)

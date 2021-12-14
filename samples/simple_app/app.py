@@ -1,10 +1,9 @@
-from logging import debug
 from pathlib import Path
 from typing import List, Optional
 
 from fastapi.param_functions import Depends
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
 from saleor_app.app import SaleorApp
@@ -14,11 +13,12 @@ from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
 from saleor_app.schemas.webhook import Webhook
+from saleor_app.settings import SaleorAppSettings
 
 PROJECT_DIR = Path(__file__).parent
 
 
-class Settings(BaseSettings):
+class Settings(SaleorAppSettings):
     debug: bool = False
     dev_saleor_token: Optional[str]
 
@@ -92,15 +92,21 @@ app = SaleorApp(
     ),
     validate_domain=validate_domain,
     save_app_data=store_app_data,
-    webhook_handlers=WebhookHandlers(
+    # TODO: make it possible not to have any webhooks
+    http_webhook_handlers=WebhookHandlers(
         product_created=product_created,
         product_updated=product_updated,
         product_deleted=product_deleted,
     ),
     get_webhook_details=get_webhook_details,
-    use_insecure_saleor_http=settings.debug,
-    development_auth_token=settings.dev_saleor_token
+    app_settings=settings,
 )
+
+
+
+
+
+
 app.configuration_router.get(
     "/", response_class=HTMLResponse, name="configuration-form"
 )(get_public_form)

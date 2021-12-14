@@ -41,7 +41,7 @@ async def install(
             saleor_domain=saleor_domain,
             auth_token=data.auth_token,
             manifest=request.app.manifest,
-            events=request.app.webhook_handlers.get_assigned_events(),
+            events=request.app.http_webhook_handlers.get_assigned_events(),
             target_url=request.url_for("handle-webhook"),
             save_app_data_callback=request.app.extra["saleor"]["save_app_data"],
             use_insecure_saleor_http=request.app.use_insecure_saleor_http,

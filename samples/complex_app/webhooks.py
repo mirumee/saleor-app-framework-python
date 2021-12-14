@@ -17,7 +17,7 @@ async def product_deleted(payload: Payload, saleor_domain: DomainName):
     print(payload)
 
 
-webhook_handlers = WebhookHandlers(
+http_webhook_handlers = WebhookHandlers(
     product_created=product_created,
     product_updated=product_updated,
     product_deleted=product_deleted,

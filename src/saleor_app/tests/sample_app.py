@@ -52,7 +52,7 @@ async def extension():
 
 
 def get_app():
-    webhook_handlers = WebhookHandlers(
+    http_webhook_handlers = WebhookHandlers(
         product_created=product_created,
         product_updated=product_updated,
         product_deleted=product_deleted,
@@ -62,7 +62,7 @@ def get_app():
     app = SaleorApp(
         validate_domain=validate_domain,
         save_app_data=store_app_data,
-        webhook_handlers=webhook_handlers,
+        http_webhook_handlers=http_webhook_handlers,
         get_webhook_details=get_webhook_details,
     )
     app.configuration_router.get(

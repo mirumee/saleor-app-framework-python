@@ -39,7 +39,7 @@ async def get_webhook_details(domain_name: DomainName) -> WebhookData:
 app = SaleorApp(
     validate_domain=validate_domain,
     save_app_data=store_app_data,
-    webhook_handlers=webhook_handlers,
+    http_webhook_handlers=webhook_handlers,
     get_webhook_details=get_webhook_details,
 )
 app.configuration_router.include_router(configuration_router)
