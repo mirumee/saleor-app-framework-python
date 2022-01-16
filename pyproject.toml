@@ -29,6 +29,8 @@ tox-poetry = "^0"
 ipdb = "^0"
 httpx = "^0"
 pytest-mock = "^3.6.1"
+mkdocs-material = "^8.1.6"
+mdx-include = "^1.4.1"
 
 [tool.poetry.extras]
 sqs = ["boto3"]
