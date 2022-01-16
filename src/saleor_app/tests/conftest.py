@@ -6,32 +6,16 @@ from saleor_app.app import SaleorApp
 from saleor_app.schemas.handlers import SQSHandlers, WebhookHandlers
 from saleor_app.schemas.manifest import Extension, Manifest
 from saleor_app.schemas.utils import LazyUrl
-from saleor_app.settings import AWSSettings, SaleorAppSettings
-
-
-class TestSettings(SaleorAppSettings):
-    debug: bool = False
+from saleor_app.settings import AWSSettings
 
 
 @pytest.fixture
-def settings():
-    return TestSettings(
-        debug=True,
-        development_auth_token="test_token",
-    )
-
-
-@pytest.fixture
-def settings_with_aws():
-    return TestSettings(
-        debug=True,
-        development_auth_token="test_token",
-        aws=AWSSettings(
-            account_id="",
-            access_key_id="",
-            secret_access_key="",
-            region="",
-        ),
+def aws_settings():
+    return AWSSettings(
+        account_id="",
+        access_key_id="",
+        secret_access_key="",
+        region="",
     )
 
 
@@ -64,9 +48,9 @@ def manifest():
 @pytest.fixture
 def http_webhook_handlers():
     return WebhookHandlers(
-        product_created=Mock(),
-        product_updated=Mock(),
-        product_deleted=Mock(),
+        product_created=AsyncMock(),
+        product_updated=AsyncMock(),
+        product_deleted=AsyncMock(),
     )
 
 
@@ -74,34 +58,44 @@ def http_webhook_handlers():
 def sqs_handlers():
     return SQSHandlers(
         product_created={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_created"
+            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_created",
+            "handler": AsyncMock(),
         },
         product_updated={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_updated"
+            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_updated",
+            "handler": AsyncMock(),
         },
         product_deleted={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_deleted"
+            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_deleted",
+            "handler": AsyncMock(),
         },
     )
 
 
 @pytest.fixture
-def saleor_app(manifest, settings_with_aws, http_webhook_handlers, sqs_handlers):
+def get_webhook_details():
+    return AsyncMock()
+
+
+@pytest.fixture
+def saleor_app(
+    manifest, aws_settings, http_webhook_handlers, sqs_handlers, get_webhook_details
+):
     saleor_app = SaleorApp(
         manifest=manifest,
         validate_domain=AsyncMock(),
         save_app_data=AsyncMock(),
-        get_webhook_details=AsyncMock(),
-        app_settings=settings_with_aws,
+        get_webhook_details=get_webhook_details,
         http_webhook_handlers=http_webhook_handlers,
+        aws_settings=aws_settings,
         sqs_handlers=sqs_handlers,
         use_insecure_saleor_http=False,
+        development_auth_token="test_token",
     )
 
     saleor_app.get("/configuration", name="configuration-form")(lambda x: x)
     saleor_app.get("/extension", name="extension")(lambda x: x)
     saleor_app.include_saleor_app_routes()
-
     return saleor_app
 
 

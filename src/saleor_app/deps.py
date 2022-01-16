@@ -33,8 +33,8 @@ async def saleor_token(
     request: Request,
     token: Optional[str] = Header(None, alias=SALEOR_TOKEN_HEADER),
 ) -> str:
-    if request.app.app_settings.development_auth_token:
-        token = token or request.app.app_settings.development_auth_token
+    if request.app.development_auth_token:
+        token = token or request.app.development_auth_token
     if not token:
         logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(

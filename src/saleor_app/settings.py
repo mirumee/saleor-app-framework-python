@@ -12,10 +12,3 @@ class AWSSettings(BaseSettings):
 
     class Config:
         env_prefix = "AWS_"
-
-
-class SaleorAppSettings(BaseSettings):
-    debug: bool = False
-    use_insecure_saleor_http: bool = False
-    development_auth_token: Optional[str] = None
-    aws: Optional[AWSSettings] = None

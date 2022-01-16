@@ -36,7 +36,7 @@ async def test_saleor_token_from_settings(mock_request):
 
 
 async def test_saleor_token_missing(mock_request):
-    mock_request.app.app_settings.development_auth_token = None
+    mock_request.app.development_auth_token = None
     with pytest.raises(HTTPException) as excinfo:
         assert await saleor_token(mock_request, None) == "test_token"
 
