@@ -1,3 +1,4 @@
+import warnings
 from typing import Awaitable, Callable, Optional
 
 from fastapi import APIRouter, Depends, FastAPI
@@ -8,7 +9,7 @@ from saleor_app.endpoints import handle_webhook, install, manifest
 from saleor_app.errors import ConfigurationError
 from saleor_app.http import WebhookRoute
 from saleor_app.schemas.core import DomainName, WebhookData
-from saleor_app.schemas.handlers import WebhookHandlers
+from saleor_app.schemas.handlers import SQSHandlers, WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
 from saleor_app.settings import SaleorAppSettings
 
@@ -23,33 +24,49 @@ class SaleorApp(FastAPI):
         get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
         app_settings: SaleorAppSettings,
         http_webhook_handlers: Optional[WebhookHandlers] = None,
-        sqs_webhook_handlers: Optional[WebhookHandlers] = None,
+        sqs_handlers: Optional[SQSHandlers] = None,
+        use_insecure_saleor_http: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
 
         self.manifest = manifest
         self.http_webhook_handlers = http_webhook_handlers
-        self.sqs_webhook_handlers = sqs_webhook_handlers
-        self.app_settings = app_settings
-        if self.sqs_webhook_handlers and not app_settings.aws:
+        self.sqs_handlers = sqs_handlers
+
+        if not isinstance(app_settings, SaleorAppSettings):
             raise ConfigurationError(
-                "To leverage SQS webhook handlers you must provide settings.aws"
+                "app_settings must inherit from saleor_app.settings.SaleorAppSettings"
             )
 
-        self.extra["saleor"] = {
-            "validate_domain": validate_domain,
-            "save_app_data": save_app_data,
-            "get_webhook_details": get_webhook_details,
-        }
+        self.app_settings = app_settings
+        if self.sqs_handlers:
+            warnings.simplefilter("always", RuntimeWarning)
+            warnings.warn(
+                "SQS support is highly experimental, be warned!",
+                category=RuntimeWarning,
+            )
+            if not app_settings.aws:
+                raise ConfigurationError(
+                    "To leverage SQS webhook handlers you must provide settings.aws"
+                )
+
+        self.validate_domain = validate_domain
+        self.save_app_data = save_app_data
+        self.get_webhook_details = get_webhook_details
+
+        self.use_insecure_saleor_http = use_insecure_saleor_http
+
         self.configuration_router = APIRouter(
             prefix="/configuration", tags=["configuration"]
         )
-        self.include_webhook_router()
+        if self.http_webhook_handlers:
+            self.include_webhook_router()
 
     def include_saleor_app_routes(self):
-        # TODO: ensure a configuration-form path was defined at this point
-        self.configuration_router.get("/manifest", response_model=Manifest)(manifest)
+        self.configuration_router.get(
+            "/manifest", response_model=Manifest, name="manifest"
+        )(manifest)
         self.configuration_router.post(
             "/install",
             responses={

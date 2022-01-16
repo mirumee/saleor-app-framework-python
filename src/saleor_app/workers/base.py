@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from signal import signal, SIGINT, SIGTERM
+from signal import SIGINT, SIGTERM, signal
 
 from saleor_app.app import SaleorApp
 from saleor_app.schemas.webhook import Webhook
@@ -38,6 +38,9 @@ class SaleorAppWorker:
             try:
                 await self.loop(queue_name=queue_name)
             except Exception as exc:
-                logger.critical("The loop exited with an error, will run the loop again in 60 seconds", exc_info=exc)
+                logger.critical(
+                    "The loop exited with an error, will run the loop again in 60 seconds",
+                    exc_info=exc,
+                )
                 asyncio.sleep(60)
         logger.info("Stopping the loop")

@@ -42,6 +42,7 @@ class SaleorClient:
                 exc = GraphQLError(
                     errors=errors, response_data=response_data.get("data")
                 )
-                logger.error(str(exc))
+                logger.error("Error when executing a GraphQL call to Saleor")
+                logger.debug(str(exc))
                 raise exc
             return response_data["data"]

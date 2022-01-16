@@ -7,7 +7,7 @@ from pydantic.fields import Field
 from pydantic.main import Extra
 
 
-class OldStyleWebhook(BaseModel):
+class WebhookV1(BaseModel):
     class Config:
         extra = Extra.allow
         allow_mutation = False
@@ -30,7 +30,7 @@ class WebhookMeta(BaseModel):
     format: Optional[str]
 
 
-class WebhookWithMeta(BaseModel):
+class WebhookV2(BaseModel):
     meta: WebhookMeta
 
     class Config:
@@ -38,7 +38,7 @@ class WebhookWithMeta(BaseModel):
         allow_mutation = False
 
 
-class NewStyleWebhook(BaseModel):
+class WebhookV3(BaseModel):
     meta: WebhookMeta
     payload: Any
 
@@ -47,4 +47,4 @@ class NewStyleWebhook(BaseModel):
         allow_mutation = False
 
 
-Webhook = Union[NewStyleWebhook, WebhookWithMeta, OldStyleWebhook]
+Webhook = Union[WebhookV3, WebhookV2, WebhookV1]

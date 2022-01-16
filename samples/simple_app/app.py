@@ -1,31 +1,37 @@
+import json
 from pathlib import Path
 from typing import List, Optional
 
 from fastapi.param_functions import Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
 from saleor_app.app import SaleorApp
-from saleor_app.deps import ConfigurationDataDeps, saleor_domain_header
-from saleor_app.endpoints import get_public_form
+from saleor_app.deps import ConfigurationDataDeps, ConfigurationFormDeps, saleor_domain_header
 from saleor_app.schemas.core import DomainName, WebhookData
-from saleor_app.schemas.handlers import WebhookHandlers
+from saleor_app.schemas.handlers import SQSHandlers, WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.utils import LazyUrl
 from saleor_app.schemas.webhook import Webhook
-from saleor_app.settings import SaleorAppSettings
+from saleor_app.settings import AWSSettings, SaleorAppSettings
 
 PROJECT_DIR = Path(__file__).parent
 
 
 class Settings(SaleorAppSettings):
     debug: bool = False
-    dev_saleor_token: Optional[str]
 
 
 settings = Settings(
     debug=True,
-    dev_saleor_token="test_token",
+    development_auth_token="test_token",
+    aws=AWSSettings(
+        account_id="",
+        access_key_id="",
+        secret_access_key="",
+        region="",
+    )
 )
 
 
@@ -34,17 +40,18 @@ class ConfigurationData(BaseModel):
     private_api_key: int
 
 
-async def validate_domain(domain_name: DomainName) -> bool:
-    return domain_name == "172.17.0.1:8000"
+async def validate_domain(saleor_domain: DomainName) -> bool:
+    return saleor_domain == "172.17.0.1:8000"
 
 
-async def store_app_data(domain_name: DomainName, app_data: WebhookData):
+async def store_app_data(saleor_domain: DomainName, auth_token: str, webhook_data: WebhookData):
     print("Called store_app_data")
-    print(domain_name)
-    print(app_data)
+    print(saleor_domain)
+    print(auth_token)
+    print(webhook_data)
 
 
-async def get_webhook_details(domain_name: DomainName) -> WebhookData:
+async def get_webhook_details(saleor_domain: DomainName) -> WebhookData:
     return WebhookData(
         token="auth-token",
         webhook_id="webhook-id",
@@ -87,24 +94,43 @@ app = SaleorApp(
         support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-simple-sample",
         permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
-        configuration_url=Manifest.url_for("configuration-form"),
+        configuration_url=LazyUrl("configuration-form"),
         extensions=[],
     ),
     validate_domain=validate_domain,
     save_app_data=store_app_data,
-    # TODO: make it possible not to have any webhooks
     http_webhook_handlers=WebhookHandlers(
         product_created=product_created,
         product_updated=product_updated,
         product_deleted=product_deleted,
     ),
+    # sqs_handlers=SQSHandlers(
+    #     product_created={
+    #         "queue_url": "awssqs://test_user:test_password@localstack:4566/000000000000/product_created",
+    #         "handler": lambda x: print(x)
+    #     },
+    #     product_updated={
+    #         "queue_url": "awssqs://test_user:test_password@localstack:4566/000000000000/product_created",
+    #         "handler": lambda x: print(x)
+    #     },
+    #     product_deleted={
+    #         "queue_url": "awssqs://test_user:test_password@localstack:4566/000000000000/product_deleted",
+    #         "handler": lambda x: print(x)
+    #     }
+    # ),
     get_webhook_details=get_webhook_details,
+    use_insecure_saleor_http=settings.debug,
     app_settings=settings,
 )
 
 
-
-
+async def get_public_form(commons: ConfigurationFormDeps = Depends()):
+    context = {
+        "request": str(commons.request),
+        "form_url": str(commons.request.url),
+        "saleor_domain": commons.saleor_domain,
+    }
+    return PlainTextResponse(json.dumps(context, indent=4))
 
 
 app.configuration_router.get(

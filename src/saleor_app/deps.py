@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import logging
-from typing import List
+from typing import List, Optional
 
 import jwt
 from fastapi import Depends, Header, HTTPException, Query, Request
@@ -19,7 +19,7 @@ SALEOR_SIGNATURE_HEADER = "x-saleor-signature"
 
 
 async def saleor_domain_header(
-    saleor_domain=Header(None, alias=SALEOR_DOMAIN_HEADER),
+    saleor_domain: Optional[str] = Header(None, alias=SALEOR_DOMAIN_HEADER),
 ) -> DomainName:
     if not saleor_domain:
         logger.warning(f"Missing {SALEOR_DOMAIN_HEADER.upper()} header.")
@@ -31,10 +31,10 @@ async def saleor_domain_header(
 
 async def saleor_token(
     request: Request,
-    token=Header(None, alias=SALEOR_TOKEN_HEADER),
+    token: Optional[str] = Header(None, alias=SALEOR_TOKEN_HEADER),
 ) -> str:
-    if request.app.development_auth_token:
-        token = token or request.app.development_auth_token
+    if request.app.app_settings.development_auth_token:
+        token = token or request.app.app_settings.development_auth_token
     if not token:
         logger.warning(f"Missing {SALEOR_TOKEN_HEADER.upper()} header.")
         raise HTTPException(
@@ -53,7 +53,7 @@ async def verify_saleor_token(
         f"{schema}://{saleor_domain}", manifest=request.app.manifest
     ) as saleor:
         try:
-            response = saleor.execute(
+            response = await saleor.execute(
                 VERIFY_TOKEN,
                 variables={
                     "token": token,
@@ -61,7 +61,6 @@ async def verify_saleor_token(
             )
         except GraphQLError:
             return False
-
     try:
         is_valid = response["tokenVerify"]["isValid"] is True
     except KeyError:
@@ -86,9 +85,7 @@ async def verify_saleor_domain(
     request: Request,
     saleor_domain=Depends(saleor_domain_header),
 ) -> bool:
-    domain_is_valid = await request.app.extra["saleor"]["validate_domain"](
-        saleor_domain
-    )
+    domain_is_valid = await request.app.validate_domain(saleor_domain)
     if not domain_is_valid:
         logger.warning(f"Provided domain {saleor_domain} is invalid.")
         raise HTTPException(
@@ -99,7 +96,7 @@ async def verify_saleor_domain(
 
 async def verify_webhook_signature(
     request: Request,
-    signature=Header(None, alias=SALEOR_SIGNATURE_HEADER),
+    signature: Optional[str] = Header(None, alias=SALEOR_SIGNATURE_HEADER),
     domain_name=Depends(saleor_domain_header),
 ):
     if not signature:
@@ -107,9 +104,7 @@ async def verify_webhook_signature(
             status_code=401,
             detail=(f"Missing signature header - {SALEOR_SIGNATURE_HEADER}"),
         )
-    webhook_details = await request.app.extra["saleor"]["get_webhook_details"](
-        domain_name
-    )
+    webhook_details = await request.app.get_webhook_details(domain_name)
     content = await request.body()
     webhook_signature_bytes = bytes(signature, "utf-8")
 

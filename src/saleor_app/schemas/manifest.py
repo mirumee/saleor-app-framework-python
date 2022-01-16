@@ -1,8 +1,9 @@
 from enum import Enum
-from typing import Callable, List, Union
+from typing import List, Union
 
 from pydantic import AnyHttpUrl, BaseModel, Field, root_validator
-from starlette.requests import Request
+
+from saleor_app.schemas.utils import LazyUrl
 
 
 class ViewType(str, Enum):
@@ -25,7 +26,7 @@ class Extension(BaseModel):
     type: ExtensionType
     target: TargetType
     permissions: List[str]
-    url: Union[AnyHttpUrl, Callable[[str], str]]
+    url: Union[AnyHttpUrl, LazyUrl]
 
     class Config:
         allow_population_by_field_name = True
@@ -39,35 +40,18 @@ class Manifest(BaseModel):
     about: str
     extensions: List[Extension]
     data_privacy: str = Field(..., alias="dataPrivacy")
-    data_privacy_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
-        ..., alias="dataPrivacyUrl"
-    )
-    homepage_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
-        ..., alias="homepageUrl"
-    )
-    support_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
-        ..., alias="supportUrl"
-    )
-    configuration_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
-        ..., alias="configurationUrl"
-    )
-    app_url: Union[AnyHttpUrl, Callable[[str], str]] = Field("", alias="appUrl")
-    token_target_url: Union[AnyHttpUrl, Callable[[str], str]] = Field(
-        ..., alias="tokenTargetUrl"
-    )
+    data_privacy_url: Union[AnyHttpUrl, LazyUrl] = Field(..., alias="dataPrivacyUrl")
+    homepage_url: Union[AnyHttpUrl, LazyUrl] = Field(..., alias="homepageUrl")
+    support_url: Union[AnyHttpUrl, LazyUrl] = Field(..., alias="supportUrl")
+    configuration_url: Union[AnyHttpUrl, LazyUrl] = Field(..., alias="configurationUrl")
+    app_url: Union[AnyHttpUrl, LazyUrl] = Field("", alias="appUrl")
+    token_target_url: Union[AnyHttpUrl, LazyUrl] = Field(..., alias="tokenTargetUrl")
 
     class Config:
         allow_population_by_field_name = True
 
-    @staticmethod
-    def url_for(name: str):
-        def resolve(request: Request):
-            return request.url_for(name=name)
-
-        return resolve
-
     @root_validator(pre=True)
     def default_token_target_url(cls, values):
         if not values.get("token_target_url"):
-            values["token_target_url"] = cls.url_for("app-install")
+            values["token_target_url"] = LazyUrl("app-install")
         return values
