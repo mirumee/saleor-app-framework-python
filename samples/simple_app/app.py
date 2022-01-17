@@ -7,13 +7,13 @@ from pydantic import BaseModel, BaseSettings
 from starlette.middleware.cors import CORSMiddleware
 
 from saleor_app.app import SaleorApp
+from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.deps import (
     ConfigurationDataDeps,
     ConfigurationFormDeps,
     saleor_domain_header,
 )
-from saleor_app.schemas.core import DomainName, WebhookData
-from saleor_app.schemas.handlers import WebhookHandlers
+from saleor_app.schemas.handlers import SaleorEventType
 from saleor_app.schemas.manifest import Manifest
 from saleor_app.schemas.utils import LazyUrl
 from saleor_app.schemas.webhook import Webhook
@@ -59,24 +59,6 @@ async def example_dependency():
     return "example"
 
 
-async def product_created(
-    payload: List[Webhook],
-    saleor_domain=Depends(saleor_domain_header),
-    example=Depends(example_dependency),
-):
-    print("Product created!")
-    print(payload)
-
-
-async def product_updated(
-    payload: List[Webhook],
-    saleor_domain=Depends(saleor_domain_header),
-    example=Depends(example_dependency),
-):
-    print("Product updated!")
-    print(payload)
-
-
 manifest = Manifest(
     name="Sample Saleor App",
     version="0.1.0",
@@ -96,17 +78,35 @@ app = SaleorApp(
     manifest=manifest,
     validate_domain=validate_domain,
     save_app_data=store_app_data,
-    get_webhook_details=get_webhook_details,
-    http_webhook_handlers=WebhookHandlers(
-        product_created=product_created,
-        product_updated=product_updated,
-    ),
     use_insecure_saleor_http=settings.debug,
     development_auth_token=settings.development_auth_token,
 )
+app.include_webhook_router(get_webhook_details=get_webhook_details)
 
 
-@app.configuration_router.get("/", response_class=HTMLResponse, name="configuration-form")
+@app.webhook_router.http_event_route(SaleorEventType.PRODUCT_CREATED)
+async def product_created(
+    payload: List[Webhook],
+    saleor_domain=Depends(saleor_domain_header),
+    example=Depends(example_dependency),
+):
+    print("Product created!")
+    print(payload)
+
+
+@app.webhook_router.http_event_route(SaleorEventType.PRODUCT_UPDATED)
+async def product_updated(
+    payload: List[Webhook],
+    saleor_domain=Depends(saleor_domain_header),
+    example=Depends(example_dependency),
+):
+    print("Product updated!")
+    print(payload)
+
+
+@app.configuration_router.get(
+    "/", response_class=HTMLResponse, name="configuration-form"
+)
 async def get_public_form(commons: ConfigurationFormDeps = Depends()):
     context = {
         "request": str(commons.request),

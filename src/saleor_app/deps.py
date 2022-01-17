@@ -51,9 +51,9 @@ async def verify_saleor_token(
     schema = "http" if request.app.use_insecure_saleor_http else "https"
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=request.app.manifest
-    ) as saleor:
+    ) as saleor_client:
         try:
-            response = await saleor.execute(
+            response = await saleor_client.execute(
                 VERIFY_TOKEN,
                 variables={
                     "token": token,

@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 from httpx import AsyncClient
 
 from saleor_app.deps import SALEOR_DOMAIN_HEADER
+from saleor_app.schemas.handlers import SaleorEventType
 from saleor_app.schemas.manifest import Manifest
 
 # app.dependency_overrides[verify_saleor_domain] = lambda: True
@@ -29,14 +30,14 @@ async def test_manifest(saleor_app):
     assert response.json() == manifest
 
 
-async def test_install(saleor_app, monkeypatch):
+async def test_install(saleor_app_with_webhooks, get_webhook_details, monkeypatch):
     install_app_mock = AsyncMock()
     monkeypatch.setattr("saleor_app.endpoints.install_app", install_app_mock)
     base_url = "http://test_app.saleor.local"
 
-    saleor_app.validate_domain = AsyncMock(return_value=True)
+    saleor_app_with_webhooks.validate_domain = AsyncMock(return_value=True)
 
-    async with AsyncClient(app=saleor_app, base_url=base_url) as ac:
+    async with AsyncClient(app=saleor_app_with_webhooks, base_url=base_url) as ac:
         response = await ac.post(
             "configuration/install",
             json={"auth_token": "saleor-app-token"},
@@ -48,21 +49,18 @@ async def test_install(saleor_app, monkeypatch):
     install_app_mock.assert_awaited_once_with(
         saleor_domain="example.com",
         auth_token="saleor-app-token",
-        manifest=saleor_app.manifest,
+        manifest=saleor_app_with_webhooks.manifest,
         events={
+            "awssqs://username:password@localstack:4566/account_id/order_created": [
+                SaleorEventType.ORDER_CREATED,
+            ],
+            "awssqs://username:password@localstack:4566/account_id/order_updated": [
+                SaleorEventType.ORDER_UPDATED,
+            ],
             "http://test_app.saleor.local/webhook": [
-                "product_created",
-                "product_updated",
-                "product_deleted",
-            ],
-            "awssqs://user:password@sqs:4556/account_id/product_created": [
-                "product_created"
-            ],
-            "awssqs://user:password@sqs:4556/account_id/product_updated": [
-                "product_updated"
-            ],
-            "awssqs://user:password@sqs:4556/account_id/product_deleted": [
-                "product_deleted"
+                SaleorEventType.PRODUCT_CREATED,
+                SaleorEventType.PRODUCT_UPDATED,
+                SaleorEventType.PRODUCT_DELETED,
             ],
         },
         use_insecure_saleor_http=False,

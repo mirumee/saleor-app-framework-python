@@ -29,14 +29,14 @@ async def install_app(
 
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
-    ) as saleor:
+    ) as saleor_client:
         for target_url, event_types in events.items():
             try:
-                response = await saleor.execute(
+                response = await saleor_client.execute(
                     CREATE_WEBHOOK,
                     variables={
                         "input": {
-                            "targetUrl": target_url,
+                            "targetUrl": str(target_url),
                             "events": [event.upper() for event in event_types],
                             "name": f"{manifest.name}",
                             "secretKey": secret_key,

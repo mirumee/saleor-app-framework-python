@@ -8,7 +8,7 @@ The only supported web framework is **FastAPI**.
 
 ### Install the framework
 
-Using Poetry (recommended):
+Using Poetry (recommended, [installing poetry](https://python-poetry.org/docs/#installation){ target=_blank }):
 
 ```bash
 poetry add git+https://github.com/saleor/saleor-app-framework-python.git@main
@@ -23,14 +23,14 @@ Using Pip:
 pip install git+https://github.com/saleor/saleor-app-framework-python.git@main 
 ```
 
-### Create the FastAPI app
+### Create the Saleor app
 
 To run your Saleor App you can use the ```#!python SaleorApp``` class which overloads the usual ```#!python FastAPI``` class.
 
-```python
+```python linenums="1"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
 
-{!./docs/../samples/simple_app/app.py[ln:95]!}
+{!./docs/../samples/simple_app/app.py[ln:77]!}
     # more arguments to come
 )
 ```
@@ -41,16 +41,16 @@ You can use the ```#!python app``` instance as you would normally use the standa
 
 As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/developer/extending/apps/manifest) an app needs a manifest, the framework provides a Pydantic representation of that which needs to be provided when initializing the app.
 
-```python
+```python linenums="1" hl_lines="2-3 6-18 22"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
 {!./docs/../samples/simple_app/app.py[ln:17]!}
 {!./docs/../samples/simple_app/app.py[ln:18]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:80-92]!}
+{!./docs/../samples/simple_app/app.py[ln:62-74]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:95-96]!}
+{!./docs/../samples/simple_app/app.py[ln:77-78]!}
     # more arguments to come
 )
 ```
@@ -63,7 +63,7 @@ As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/d
 
 3rd Patry Apps work in a multi-tenant fashion - one app service can serve multiple Saleor instances. To prevent any Saleor instance from using your app the app need to authorize a Saleor instance that's done by a simple function that can be as simple as comparing the incoming Saleor domain or as complex to check the allowed domains in a database.
 
-```python
+```python linenums="1" hl_lines="2 7-8 28"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
 from saleor_app.schemas.core import DomainName
 {!./docs/../samples/simple_app/app.py[ln:17]!}
@@ -73,10 +73,10 @@ from saleor_app.schemas.core import DomainName
 {!./docs/../samples/simple_app/app.py[ln:38-39]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:80-92]!}
+{!./docs/../samples/simple_app/app.py[ln:62-74]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:95-97]!}
+{!./docs/../samples/simple_app/app.py[ln:77-79]!}
     # more arguments to come
 )
 ```
@@ -86,9 +86,9 @@ from saleor_app.schemas.core import DomainName
 
 When Saleor is authorized to install the app an authentication key is issued, that key needs to be securely stored by the app as it provides as much access as the app requested in the manifest.
 
-```python
+```python linenums="1" hl_lines="2 11-17 38"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
-{!./docs/../samples/simple_app/app.py[ln:15]!}
+{!./docs/../samples/simple_app/app.py[ln:10]!}
 {!./docs/../samples/simple_app/app.py[ln:17]!}
 {!./docs/../samples/simple_app/app.py[ln:18]!}
 
@@ -96,10 +96,10 @@ When Saleor is authorized to install the app an authentication key is issued, th
 {!./docs/../samples/simple_app/app.py[ln:38-48]!} #(1)
 
 
-{!./docs/../samples/simple_app/app.py[ln:80-92]!}
+{!./docs/../samples/simple_app/app.py[ln:62-74]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:95-98]!}
+{!./docs/../samples/simple_app/app.py[ln:77-80]!}
 )
 ```
 
@@ -110,14 +110,14 @@ When Saleor is authorized to install the app an authentication key is issued, th
 
 To finalize you need to provide the endpoint named ```#!python configuration-form``` sepecified in the [Manifest](#manifest).
 
-```python
+```python linenums="1" hl_lines="1 3-4 8 48-100"
 import json
 
 {!./docs/../samples/simple_app/app.py[ln:4-5]!}
 
 {!./docs/../samples/simple_app/app.py[ln:9]!}
+{!./docs/../samples/simple_app/app.py[ln:10]!}
 from saleor_app.deps import ConfigurationFormDeps
-{!./docs/../samples/simple_app/app.py[ln:15]!}
 {!./docs/../samples/simple_app/app.py[ln:17]!}
 {!./docs/../samples/simple_app/app.py[ln:18]!}
 
@@ -125,14 +125,14 @@ from saleor_app.deps import ConfigurationFormDeps
 {!./docs/../samples/simple_app/app.py[ln:38-48]!} 
 
 
-{!./docs/../samples/simple_app/app.py[ln:80-92]!}
+{!./docs/../samples/simple_app/app.py[ln:62-74]!}
 
 
-{!./docs/../samples/simple_app/app.py[ln:95-98]!}
+{!./docs/../samples/simple_app/app.py[ln:77-80]!}
 )
 
 
-{!./docs/../samples/simple_app/app.py[ln:109-116]!}
+{!./docs/../samples/simple_app/app.py[ln:107-116]!}
 
 
 {!./docs/../samples/simple_app/app.py[ln:124]!} #(1)
@@ -142,6 +142,7 @@ from saleor_app.deps import ConfigurationFormDeps
 
 > This is a complete example that will work as is.
 
+!!! warning "Remember about `app.include_saleor_app_routes()`"
 
 ### Running the App
 
@@ -153,7 +154,7 @@ uvicorn simple_app.app:app --host 0.0.0.0 --port 5000 --reload
 
 Or create a `simple_app/__main__.py` with:
 
-```python
+```python linenums="1" 
 import uvicorn
 
 

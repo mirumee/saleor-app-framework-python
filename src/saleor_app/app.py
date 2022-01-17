@@ -1,17 +1,11 @@
-import warnings
 from typing import Awaitable, Callable, Optional
 
-from fastapi import APIRouter, Depends, FastAPI
-from fastapi.routing import APIRoute
+from fastapi import APIRouter, FastAPI
 
-from saleor_app.deps import verify_saleor_domain, verify_webhook_signature
-from saleor_app.endpoints import handle_webhook, install, manifest
-from saleor_app.errors import ConfigurationError
-from saleor_app.http import WebhookRoute
+from saleor_app.endpoints import install, manifest
 from saleor_app.schemas.core import DomainName, WebhookData
-from saleor_app.schemas.handlers import SQSHandlers, WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
-from saleor_app.settings import AWSSettings
+from saleor_app.webhook import WebhookRoute, WebhookRouter
 
 
 class SaleorApp(FastAPI):
@@ -21,12 +15,6 @@ class SaleorApp(FastAPI):
         manifest: Manifest,
         validate_domain: Callable[[DomainName], Awaitable[bool]],
         save_app_data: Callable[[DomainName, WebhookData], Awaitable],
-        get_webhook_details: Optional[
-            Callable[[DomainName], Awaitable[WebhookData]]
-        ] = None,
-        http_webhook_handlers: Optional[WebhookHandlers] = None,
-        aws_settings: Optional[AWSSettings] = None,
-        sqs_handlers: Optional[SQSHandlers] = None,
         use_insecure_saleor_http: bool = False,
         development_auth_token: Optional[str] = None,
         **kwargs,
@@ -34,20 +22,6 @@ class SaleorApp(FastAPI):
         super().__init__(**kwargs)
 
         self.manifest = manifest
-        self.http_webhook_handlers = http_webhook_handlers
-        self.sqs_handlers = sqs_handlers
-
-        if self.sqs_handlers:
-            self.aws_settings = aws_settings
-            warnings.simplefilter("always", RuntimeWarning)
-            warnings.warn(
-                "SQS support is highly experimental, be warned!",
-                category=RuntimeWarning,
-            )
-            if not aws_settings:
-                raise ConfigurationError(
-                    "To leverage SQS webhook handlers you must provide aws_settings"
-                )
 
         self.validate_domain = validate_domain
         self.save_app_data = save_app_data
@@ -58,9 +32,6 @@ class SaleorApp(FastAPI):
         self.configuration_router = APIRouter(
             prefix="/configuration", tags=["configuration"]
         )
-        if self.http_webhook_handlers:
-            self.get_webhook_details = get_webhook_details
-            self.include_webhook_router()
 
     def include_saleor_app_routes(self):
         self.configuration_router.get(
@@ -77,28 +48,18 @@ class SaleorApp(FastAPI):
 
         self.include_router(self.configuration_router)
 
-    def include_webhook_router(self):
-        router = APIRouter(
+    def include_webhook_router(
+        self, get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]]
+    ):
+        self.get_webhook_details = get_webhook_details
+        self.webhook_router = WebhookRouter(
             prefix="/webhook",
             responses={
                 400: {"description": "Missing required header"},
                 401: {"description": "Incorrect signature"},
                 404: {"description": "Incorrect saleor event"},
             },
-            dependencies=[
-                Depends(verify_saleor_domain),
-                Depends(verify_webhook_signature),
-            ],
             route_class=WebhookRoute,
         )
 
-        router.post("", name="handle-webhook")(handle_webhook)
-        self.webhook_handler_routes = {
-            name: APIRoute(
-                "",
-                handler,
-            )
-            for name, handler in self.http_webhook_handlers
-            if handler
-        }
-        self.include_router(router)
+        self.include_router(self.webhook_router)

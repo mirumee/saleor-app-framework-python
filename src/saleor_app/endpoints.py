@@ -1,16 +1,12 @@
-from typing import List
-
-from fastapi import Depends, Header, Request
+from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 
 from saleor_app.deps import saleor_domain_header, verify_saleor_domain
 from saleor_app.errors import InstallAppError
-from saleor_app.http import SALEOR_EVENT_HEADER
 from saleor_app.install import install_app
 from saleor_app.saleor.exceptions import GraphQLError
 from saleor_app.schemas.core import InstallData
 from saleor_app.schemas.utils import LazyUrl
-from saleor_app.schemas.webhook import Webhook
 
 
 async def manifest(request: Request):
@@ -32,12 +28,14 @@ async def install(
     saleor_domain=Depends(saleor_domain_header),
 ):
     events = {}
-    if request.app.http_webhook_handlers:
-        events[
-            request.url_for("handle-webhook")
-        ] = request.app.http_webhook_handlers.get_assigned_events()
-    if request.app.sqs_handlers:
-        events.update(request.app.sqs_handlers.get_assigned_events())
+    if request.app.webhook_router.http_routes:
+        events[request.url_for("handle-webhook")] = list(
+            request.app.webhook_router.http_routes.keys()
+        )
+    for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
+        key = str(sqs_handler.target_url)
+        events.setdefault(key, [])
+        events[key].append(event_type)
 
     if events:
         try:
@@ -61,13 +59,4 @@ async def install(
         webhook_data=webhook_data,
     )
 
-    return {}
-
-
-async def handle_webhook(
-    request: Request,
-    payload: List[Webhook],  # FIXME provide a way to proper define payload types
-    saleor_domain=Depends(saleor_domain_header),
-    _event_type=Header(None, alias=SALEOR_EVENT_HEADER),
-):
     return {}

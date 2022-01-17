@@ -89,7 +89,8 @@ async def test_verify_saleor_domain_invalid(mock_request):
     assert excinfo.value.detail == "Provided domain saleor_domain is invalid."
 
 
-async def test_verify_webhook_signature(mock_request, mocker):
+async def test_verify_webhook_signature(get_webhook_details, mock_request, mocker):
+    mock_request.app.include_webhook_router(get_webhook_details)
     mock_request.app.get_webhook_details.return_value = WebhookData(
         webhook_id="webhook_id", webhook_secret_key="webhook_secret_key"
     )
@@ -104,7 +105,10 @@ async def test_verify_webhook_signature(mock_request, mocker):
     )
 
 
-async def test_verify_webhook_signature_invalid(mock_request, mocker):
+async def test_verify_webhook_signature_invalid(
+    get_webhook_details, mock_request, mocker
+):
+    mock_request.app.include_webhook_router(get_webhook_details)
     mock_request.app.get_webhook_details.return_value = WebhookData(
         webhook_id="webhook_id", webhook_secret_key="webhook_secret_key"
     )

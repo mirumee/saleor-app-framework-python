@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from saleor_app.app import SaleorApp
-from saleor_app.schemas.handlers import SQSHandlers, WebhookHandlers
+from saleor_app.schemas.handlers import SaleorEventType, SQSUrl
 from saleor_app.schemas.manifest import Extension, Manifest
 from saleor_app.schemas.utils import LazyUrl
 from saleor_app.settings import AWSSettings
@@ -46,56 +46,68 @@ def manifest():
 
 
 @pytest.fixture
-def http_webhook_handlers():
-    return WebhookHandlers(
-        product_created=AsyncMock(),
-        product_updated=AsyncMock(),
-        product_deleted=AsyncMock(),
-    )
-
-
-@pytest.fixture
-def sqs_handlers():
-    return SQSHandlers(
-        product_created={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_created",
-            "handler": AsyncMock(),
-        },
-        product_updated={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_updated",
-            "handler": AsyncMock(),
-        },
-        product_deleted={
-            "queue_url": "awssqs://user:password@sqs:4556/account_id/product_deleted",
-            "handler": AsyncMock(),
-        },
-    )
-
-
-@pytest.fixture
 def get_webhook_details():
     return AsyncMock()
 
 
 @pytest.fixture
-def saleor_app(
-    manifest, aws_settings, http_webhook_handlers, sqs_handlers, get_webhook_details
-):
+def webhook_handler():
+    return AsyncMock()
+
+
+@pytest.fixture
+def saleor_app(manifest):
     saleor_app = SaleorApp(
         manifest=manifest,
         validate_domain=AsyncMock(),
         save_app_data=AsyncMock(),
-        get_webhook_details=get_webhook_details,
-        http_webhook_handlers=http_webhook_handlers,
-        aws_settings=aws_settings,
-        sqs_handlers=sqs_handlers,
         use_insecure_saleor_http=False,
         development_auth_token="test_token",
     )
 
     saleor_app.get("/configuration", name="configuration-form")(lambda x: x)
     saleor_app.get("/extension", name="extension")(lambda x: x)
+    saleor_app.get("/test_webhook_handler", name="test-webhook-handler")(lambda x: x)
     saleor_app.include_saleor_app_routes()
+    return saleor_app
+
+
+@pytest.fixture
+def saleor_app_with_webhooks(saleor_app, get_webhook_details, webhook_handler):
+    saleor_app.include_webhook_router(get_webhook_details)
+    saleor_app.webhook_router.http_event_route(SaleorEventType.PRODUCT_CREATED)(
+        webhook_handler
+    )
+    saleor_app.webhook_router.http_event_route(SaleorEventType.PRODUCT_UPDATED)(
+        webhook_handler
+    )
+    saleor_app.webhook_router.http_event_route(SaleorEventType.PRODUCT_DELETED)(
+        webhook_handler
+    )
+    saleor_app.webhook_router.sqs_event_route(
+        SQSUrl(
+            None,
+            scheme="awssqs",
+            user="username",
+            password="password",
+            host="localstack",
+            port="4566",
+            path="/account_id/order_created",
+        ),
+        SaleorEventType.ORDER_CREATED,
+    )(webhook_handler)
+    saleor_app.webhook_router.sqs_event_route(
+        SQSUrl(
+            None,
+            scheme="awssqs",
+            user="username",
+            password="password",
+            host="localstack",
+            port="4566",
+            path="/account_id/order_updated",
+        ),
+        SaleorEventType.ORDER_UPDATED,
+    )(webhook_handler)
     return saleor_app
 
 
