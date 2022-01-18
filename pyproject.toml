@@ -80,13 +80,19 @@ build-backend = "poetry.core.masonry.api"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py38, py39, py310, lint, coverage
+envlist = py38, py39, py310, lint, docs, coverage
 
 [testenv]
 description = run the test driver with {basepython}
 deps = .[develop]
 commands =
     pytest src/saleor_app
+
+[testenv:docs]
+description = check if docs have no errors or warnings
+basepython = python3.10
+commands =
+    mkdocs build -s
 
 [testenv:lint]
 description = check the code style

@@ -7,10 +7,6 @@ from saleor_app.deps import SALEOR_DOMAIN_HEADER
 from saleor_app.schemas.handlers import SaleorEventType
 from saleor_app.schemas.manifest import Manifest
 
-# app.dependency_overrides[verify_saleor_domain] = lambda: True
-# app.dependency_overrides[saleor_domain_header] = lambda: saleor_domain
-# app.dependency_overrides[webhook_event_type] = lambda: "product_created"
-
 
 async def test_manifest(saleor_app):
     base_url = "http://test_app.saleor.local"

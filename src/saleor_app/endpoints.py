@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 
@@ -27,14 +29,13 @@ async def install(
     _domain_is_valid=Depends(verify_saleor_domain),
     saleor_domain=Depends(saleor_domain_header),
 ):
-    events = {}
+    events = defaultdict(list)
     if request.app.webhook_router.http_routes:
         events[request.url_for("handle-webhook")] = list(
             request.app.webhook_router.http_routes.keys()
         )
     for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
         key = str(sqs_handler.target_url)
-        events.setdefault(key, [])
         events[key].append(event_type)
 
     if events:

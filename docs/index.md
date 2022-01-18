@@ -1,6 +1,6 @@
 # Welcome to Saleor App Framework 
 
-You are reading the Saleor App Framework (Python) documentation. This document should help you to quickly bootstrap a 3rd Party Saleor App, read more about those [:saleor-saleor: Saleor's documentation](https://docs.saleor.io/docs/3.0/developer/extending/apps/key-concepts).
+You are reading the Saleor App Framework (Python) documentation. This document should help you to quickly bootstrap a 3rd Party Saleor App, read more about those [:saleor-saleor: Saleor's documentation](https://docs.saleor.io/docs/3.0/developer/extending/apps/key-concepts){ target=_blank }.
 
 The only supported web framework is **FastAPI**.
 
@@ -8,7 +8,7 @@ The only supported web framework is **FastAPI**.
 
 ### Install the framework
 
-Using Poetry (recommended, [installing poetry](https://python-poetry.org/docs/#installation){ target=_blank }):
+Using Poetry (recommended, [:material-file-link: installing poetry](https://python-poetry.org/docs/#installation){ target=_blank }):
 
 ```bash
 poetry add git+https://github.com/saleor/saleor-app-framework-python.git@main
@@ -39,7 +39,7 @@ You can use the ```#!python app``` instance as you would normally use the standa
 
 #### Manifest
 
-As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/developer/extending/apps/manifest) an app needs a manifest, the framework provides a Pydantic representation of that which needs to be provided when initializing the app.
+As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/developer/extending/apps/manifest){ target=_blank } an app needs a manifest, the framework provides a Pydantic representation of that which needs to be provided when initializing the app.
 
 ```python linenums="1" hl_lines="2-3 6-18 22"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
@@ -108,7 +108,7 @@ When Saleor is authorized to install the app an authentication key is issued, th
 
 #### Configuration URL
 
-To finalize you need to provide the endpoint named ```#!python configuration-form``` sepecified in the [Manifest](#manifest).
+To finalize, you need to provide the endpoint named ```#!python configuration-form``` specified in the [#Manifest](#manifest).
 
 ```python linenums="1" hl_lines="1 3-4 8 48-100"
 import json
@@ -173,3 +173,7 @@ and run the module as a script with Python's `-m` flag:
 ```bash
 python -m simple_app
 ```
+
+## Examples
+
+Visit the [:material-github: Samples directory](https://github.com/saleor/saleor-app-framework-python/tree/main/samples){ target=_blank } to check apps that were built as examples of how the framework can be used.

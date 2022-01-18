@@ -1,13 +1,14 @@
 import logging
 import secrets
 import string
-from typing import Dict, Optional
+from typing import Dict
 
 from saleor_app.errors import InstallAppError
 from saleor_app.saleor.exceptions import GraphQLError
 from saleor_app.saleor.mutations import CREATE_WEBHOOK
 from saleor_app.saleor.utils import get_client_for_app
 from saleor_app.schemas.core import AppToken, DomainName, WebhookData
+from saleor_app.schemas.handlers import SaleorEventType
 from saleor_app.schemas.manifest import Manifest
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ async def install_app(
     saleor_domain: DomainName,
     auth_token: AppToken,
     manifest: Manifest,
-    events: Optional[Dict[str, str]],
+    events: Dict[str, SaleorEventType],
     use_insecure_saleor_http: bool,
 ):
     alphabet = string.ascii_letters + string.digits
