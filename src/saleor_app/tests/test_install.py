@@ -1,179 +1,82 @@
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
-import pytest
-
-from saleor_app.conf import get_settings
-from saleor_app.errors import InstallAppError
-from saleor_app.graphql import GraphQLError
-from saleor_app.install import CREATE_WEBHOOK, install_app
+from saleor_app.install import install_app
+from saleor_app.saleor.client import SaleorClient
+from saleor_app.saleor.mutations import CREATE_WEBHOOK
 from saleor_app.schemas.core import WebhookData
 
 
-@pytest.mark.asyncio
-async def test_install_app(monkeypatch):
-    saleor_webhook_id = "V2ViaG9vazoz"
-    json_response = {
-        "data": {"webhookCreate": {"errors": [], "webhook": {"id": saleor_webhook_id}}}
+async def test_install_app(mocker, manifest):
+    mock_saleor_client = AsyncMock(SaleorClient)
+    mock_saleor_client.__aenter__.return_value.execute.return_value = {
+        "webhookCreate": {"webhook": {"id": "123"}}
     }
-    settings = get_settings()
-    response = MagicMock()
-    response.__getitem__.side_effect = json_response.__getitem__
-    response.get.side_effect = json_response.get
-
-    errors = None
-
-    mocked_executor = AsyncMock(return_value=(response, errors))
-    monkeypatch.setattr(
-        "saleor_app.install.get_executor", lambda host, auth_token: mocked_executor
+    mock_get_client_for_app = mocker.patch(
+        "saleor_app.install.get_client_for_app", return_value=mock_saleor_client
     )
-    monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
+    mocker.patch("saleor_app.install.secrets.choice", return_value="A")
 
-    save_app_data_fun = AsyncMock()
-
-    events = ["ORDER_CREATED", "PRODUCT_CREATED"]
-    target_url = "saleor.io/app/webhook-url"
-    saleor_store_domain = "saleor.io"
-    saleor_app_token = "saleor-token"
-
-    await install_app(
-        domain=saleor_store_domain,
-        token=saleor_app_token,
-        events=events,
-        target_url=target_url,
-        save_app_data=save_app_data_fun,
-    )
-
-    expected_secret_key = "a" * 20
-    variables = {
-        "input": {
-            "targetUrl": target_url,
-            "events": [event.upper() for event in events],
-            "name": settings.app_name,
-            "secretKey": expected_secret_key,
-        }
-    }
-    mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
-
-    save_app_data_fun.assert_awaited_once_with(
-        saleor_store_domain,
-        WebhookData(
-            token=saleor_app_token,
-            webhook_id=saleor_webhook_id,
-            webhook_secret_key=expected_secret_key,
-        ),
-    )
-
-
-@pytest.mark.asyncio
-async def test_install_app_graphql_error(monkeypatch):
-    json_failed_response = {
-        "errors": [
-            {
-                "message": "You do not have permission to perform this action",
-            }
-        ]
-    }
-    settings = get_settings()
-    response = MagicMock()
-    response.__getitem__.side_effect = json_failed_response.__getitem__
-    response.get.side_effect = json_failed_response.get
-
-    errors = [
-            {
-                "message": "You do not have permission to perform this action",
-            }
-        ]
-
-    mocked_executor = AsyncMock(return_value=(response, errors))
-    monkeypatch.setattr(
-        "saleor_app.install.get_executor", lambda host, auth_token: mocked_executor
-    )
-    monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
-
-    save_app_data_fun = AsyncMock()
-
-    events = ["ORDER_CREATED", "PRODUCT_CREATED"]
-    target_url = "saleor.io/app/webhook-url"
-    saleor_store_domain = "saleor.io"
-    saleor_app_token = "saleor-token"
-
-    with pytest.raises(GraphQLError):
+    assert (
         await install_app(
-            domain=saleor_store_domain,
-            token=saleor_app_token,
-            events=events,
-            target_url=target_url,
-            save_app_data=save_app_data_fun,
+            saleor_domain="saleor_domain",
+            auth_token="test_token",
+            manifest=manifest,
+            events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+            use_insecure_saleor_http=True,
         )
-
-    expected_secret_key = "a" * 20
-    variables = {
-        "input": {
-            "targetUrl": target_url,
-            "events": [event.upper() for event in events],
-            "name": settings.app_name,
-            "secretKey": expected_secret_key,
-        }
-    }
-    mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
-
-    assert not save_app_data_fun.called
-
-
-@pytest.mark.asyncio
-async def test_install_app_mutation_error(monkeypatch):
-    json_failed_response = {
-        "data": {
-            "webhookCreate": {
-                "errors": [
-                    {
-                        "field": None,
-                        "message": "Missing token or app",
-                        "code": "INVALID",
-                    }
-                ],
-                "webhook": None,
-            }
-        }
-    }
-    settings = get_settings()
-    response = MagicMock()
-    response.__getitem__.side_effect = json_failed_response.__getitem__
-    response.get.side_effect = json_failed_response.get
-
-    errors = None
-
-    mocked_executor = AsyncMock(return_value=(response, errors))
-    monkeypatch.setattr(
-        "saleor_app.install.get_executor", lambda host, auth_token: mocked_executor
+        == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
     )
-    monkeypatch.setattr("saleor_app.install.secrets.choice", lambda _: "a")
 
-    save_app_data_fun = AsyncMock()
+    mock_get_client_for_app.assert_called_once_with(
+        "http://saleor_domain", manifest=manifest, auth_token="test_token"
+    )
 
-    events = ["ORDER_CREATED", "PRODUCT_CREATED"]
-    target_url = "saleor.io/app/webhook-url"
-    saleor_store_domain = "saleor.io"
-    saleor_app_token = "saleor-token"
+    assert mock_saleor_client.__aenter__.return_value.execute.call_count == 2
+    mock_saleor_client.__aenter__.return_value.execute.assert_any_await(
+        CREATE_WEBHOOK,
+        variables={
+            "input": {
+                "targetUrl": "queue_1",
+                "events": ["TEST_EVENT_1"],
+                "name": f"{manifest.name}",
+                "secretKey": "A" * 20,
+            }
+        },
+    )
 
-    with pytest.raises(InstallAppError):
-        await install_app(
-            domain=saleor_store_domain,
-            token=saleor_app_token,
-            events=events,
-            target_url=target_url,
-            save_app_data=save_app_data_fun,
-        )
+    mock_saleor_client.__aenter__.return_value.execute.assert_any_await(
+        CREATE_WEBHOOK,
+        variables={
+            "input": {
+                "targetUrl": "url_1",
+                "events": ["TEST_EVENT_2"],
+                "name": f"{manifest.name}",
+                "secretKey": "A" * 20,
+            }
+        },
+    )
 
-    expected_secret_key = "a" * 20
-    variables = {
-        "input": {
-            "targetUrl": target_url,
-            "events": [event.upper() for event in events],
-            "name": settings.app_name,
-            "secretKey": expected_secret_key,
-        }
+
+async def test_install_app_secure_https(mocker, manifest):
+    mock_saleor_client = AsyncMock(SaleorClient)
+    mock_saleor_client.__aenter__.return_value.execute.return_value = {
+        "webhookCreate": {"webhook": {"id": "123"}}
     }
-    mocked_executor.assert_awaited_once_with(CREATE_WEBHOOK, variables=variables)
+    mock_get_client_for_app = mocker.patch(
+        "saleor_app.install.get_client_for_app", return_value=mock_saleor_client
+    )
+    mocker.patch("saleor_app.install.secrets.choice", return_value="A")
+    assert (
+        await install_app(
+            saleor_domain="saleor_domain",
+            auth_token="test_token",
+            manifest=manifest,
+            events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+            use_insecure_saleor_http=False,
+        )
+        == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
+    )
 
-    assert not save_app_data_fun.called
+    mock_get_client_for_app.assert_called_once_with(
+        "https://saleor_domain", manifest=manifest, auth_token="test_token"
+    )

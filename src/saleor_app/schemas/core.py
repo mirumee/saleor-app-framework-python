@@ -8,7 +8,6 @@ Url = str
 
 
 class WebhookData(BaseModel):
-    token: str
     webhook_id: str
     webhook_secret_key: str
 
@@ -35,3 +34,4 @@ class SaleorPermissions(str, Enum):
     MANAGE_STAFF = "MANAGE_STAFF"
     MANAGE_TRANSLATIONS = "MANAGE_TRANSLATIONS"
     MANAGE_USERS = "MANAGE_USERS"
+    HANDLE_PAYMENTS = "HANDLE_PAYMENTS"

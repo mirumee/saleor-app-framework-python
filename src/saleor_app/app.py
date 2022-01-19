@@ -1,39 +1,42 @@
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Optional
 
 from fastapi import APIRouter, FastAPI
 
-from saleor_app.endpoints import handle_webhook, install, manifest
+from saleor_app.endpoints import install, manifest
 from saleor_app.schemas.core import DomainName, WebhookData
-from saleor_app.schemas.handlers import WebhookHandlers
 from saleor_app.schemas.manifest import Manifest
+from saleor_app.webhook import WebhookRoute, WebhookRouter
 
 
 class SaleorApp(FastAPI):
     def __init__(
         self,
         *,
+        manifest: Manifest,
         validate_domain: Callable[[DomainName], Awaitable[bool]],
         save_app_data: Callable[[DomainName, WebhookData], Awaitable],
-        webhook_handlers: WebhookHandlers,
-        get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]],
+        use_insecure_saleor_http: bool = False,
+        development_auth_token: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
 
-        self.extra["saleor"] = {
-            "validate_domain": validate_domain,
-            "save_app_data": save_app_data,
-            "webhook_handlers": webhook_handlers,
-            "get_webhook_details": get_webhook_details,
-        }
+        self.manifest = manifest
+
+        self.validate_domain = validate_domain
+        self.save_app_data = save_app_data
+
+        self.use_insecure_saleor_http = use_insecure_saleor_http
+        self.development_auth_token = development_auth_token
+
         self.configuration_router = APIRouter(
             prefix="/configuration", tags=["configuration"]
         )
-        self.include_webhook_router()
 
     def include_saleor_app_routes(self):
-        # TODO: ensure a configuration-form path was defined at this point
-        self.configuration_router.get("/manifest", response_model=Manifest)(manifest)
+        self.configuration_router.get(
+            "/manifest", response_model=Manifest, name="manifest"
+        )(manifest)
         self.configuration_router.post(
             "/install",
             responses={
@@ -45,14 +48,18 @@ class SaleorApp(FastAPI):
 
         self.include_router(self.configuration_router)
 
-    def include_webhook_router(self):
-        router = APIRouter(
+    def include_webhook_router(
+        self, get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]]
+    ):
+        self.get_webhook_details = get_webhook_details
+        self.webhook_router = WebhookRouter(
             prefix="/webhook",
             responses={
                 400: {"description": "Missing required header"},
                 401: {"description": "Incorrect signature"},
                 404: {"description": "Incorrect saleor event"},
             },
+            route_class=WebhookRoute,
         )
-        router.post("/", name="handle-webhook")(handle_webhook)
-        self.include_router(router)
+
+        self.include_router(self.webhook_router)
