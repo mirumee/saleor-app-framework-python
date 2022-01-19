@@ -5,5 +5,5 @@ exclude =
     docs/,
     node_modules/,
     */versions/
-ignore = H101,H238,H301,H306,W503
+ignore = H101,H238,H301,H306,W503,E501
 max-line-length = 88

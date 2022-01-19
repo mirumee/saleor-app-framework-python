@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "saleor-app"
-version = "0.1.1"
+version = "0.2.1"
 description = "Saleor app framework"
 authors = [ "Saleor Commerce <hello@saleor.io>" ]
 
@@ -10,8 +10,9 @@ fastapi = "^0"
 uvicorn = "^0"
 Jinja2 = "^2"
 aiofiles = "^0"
-aiohttp = "^3"
+aiohttp = "^3.8"
 jwt = "^1"
+boto3 = {version = "^1.20.24", optional = true}
 
 [tool.poetry.dev-dependencies]
 ipython = "^7"
@@ -27,6 +28,15 @@ tox = "^3"
 tox-poetry = "^0"
 ipdb = "^0"
 httpx = "^0"
+pytest-mock = "^3.6.1"
+mkdocs-material = "^8.1.6"
+mdx-include = "^1.4.1"
+
+[tool.poetry.extras]
+sqs = ["boto3"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [tool.black]
 target_version = ['py38']
@@ -70,7 +80,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py38, py39, lint, coverage
+envlist = py38, py39, py310, lint, docs, coverage
 
 [testenv]
 description = run the test driver with {basepython}
@@ -78,9 +88,15 @@ deps = .[develop]
 commands =
     pytest src/saleor_app
 
+[testenv:docs]
+description = check if docs have no errors or warnings
+basepython = python3.10
+commands =
+    mkdocs build -s
+
 [testenv:lint]
 description = check the code style
-basepython = python3.9
+basepython = python3.10
 commands =
     black --diff --check src/saleor_app
     isort -c -rc --diff src/saleor_app

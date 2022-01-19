@@ -1,59 +1,60 @@
 import logging
 import secrets
 import string
-from typing import Awaitable, Callable, List
+from typing import Dict
 
-from saleor_app.conf import get_settings
 from saleor_app.errors import InstallAppError
-from saleor_app.graphql import GraphQLError, get_executor, get_saleor_api_url
-from saleor_app.mutations import CREATE_WEBHOOK
-from saleor_app.schemas.core import AppToken, DomainName, Url, WebhookData
+from saleor_app.saleor.exceptions import GraphQLError
+from saleor_app.saleor.mutations import CREATE_WEBHOOK
+from saleor_app.saleor.utils import get_client_for_app
+from saleor_app.schemas.core import AppToken, DomainName, WebhookData
+from saleor_app.schemas.handlers import SaleorEventType
+from saleor_app.schemas.manifest import Manifest
 
 logger = logging.getLogger(__name__)
 
 
 async def install_app(
-    domain: DomainName,
-    token: AppToken,
-    events: List[str],
-    target_url: Url,
-    save_app_data: Callable[[DomainName, WebhookData], Awaitable],
+    saleor_domain: DomainName,
+    auth_token: AppToken,
+    manifest: Manifest,
+    events: Dict[str, SaleorEventType],
+    use_insecure_saleor_http: bool,
 ):
     alphabet = string.ascii_letters + string.digits
     secret_key = "".join(secrets.choice(alphabet) for _ in range(20))
 
-    api_url = get_saleor_api_url(domain)
-    executor = get_executor(host=api_url, auth_token=token)
+    schema = "http" if use_insecure_saleor_http else "https"
 
-    settings = get_settings()
+    errors = []
 
-    response, errors = await executor(
-        CREATE_WEBHOOK,
-        variables={
-            "input": {
-                "targetUrl": target_url,
-                "events": [event.upper() for event in events],
-                "name": settings.app_name,
-                "secretKey": secret_key,
-            }
-        },
-    )
+    async with get_client_for_app(
+        f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
+    ) as saleor_client:
+        for target_url, event_types in events.items():
+            try:
+                response = await saleor_client.execute(
+                    CREATE_WEBHOOK,
+                    variables={
+                        "input": {
+                            "targetUrl": str(target_url),
+                            "events": [event.upper() for event in event_types],
+                            "name": f"{manifest.name}",
+                            "secretKey": secret_key,
+                        }
+                    },
+                )
+            except GraphQLError as exc:
+                errors.append(exc)
 
     if errors:
-        logger.warning("Webhook create mutation raised an error")
-        raise GraphQLError("Webhook create mutation raised an error")
-
-    webhook_error = response["data"]["webhookCreate"].get("errors")
-    if webhook_error:
-        logger.warning(
-            "Unable to finish installation of app for %s. Received error: %s",
-            domain,
-            webhook_error,
+        logger.error("Unable to finish installation of app for %s.", saleor_domain)
+        logger.debug(
+            "Unable to finish installation of app for %s. Received errors: %s",
+            saleor_domain,
+            list(map(str, errors)),
         )
-        raise InstallAppError("Failed to create webhook for %s.", domain)
+        raise InstallAppError("Failed to create webhooks for %s.", saleor_domain)
 
-    saleor_webhook_id = response["data"]["webhookCreate"]["webhook"]["id"]
-    install_app_data = WebhookData(
-        token=token, webhook_id=saleor_webhook_id, webhook_secret_key=secret_key
-    )
-    await save_app_data(domain, install_app_data)
+    saleor_webhook_id = response["webhookCreate"]["webhook"]["id"]
+    return WebhookData(webhook_id=saleor_webhook_id, webhook_secret_key=secret_key)

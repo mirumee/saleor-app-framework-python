@@ -3,48 +3,60 @@ from starlette.staticfiles import StaticFiles
 
 from saleor_app.app import SaleorApp
 from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.handlers import SaleorEventType
 
-from .configuration_endpoints import router as configuration_router
-from .db import configuration, get_db
-from .extension import router as extension_router
-from .settings import settings
-from .webhooks import webhook_handlers
-
-
-async def validate_domain(domain_name: DomainName) -> bool:
-    return domain_name == "172.17.0.1:8000"
+from .endpoints.configuration import router as configuration_router
+from .db import configuration, get_db, get_domain_config, update_domain_config
+from .endpoints.extension import router as extension_router
+from .settings import settings, manifest
+from .webhooks import product_created, product_updated, product_deleted
 
 
-async def store_app_data(domain_name: DomainName, app_data: WebhookData):
-    print("Called store_app_data")
-    query = configuration.insert().values(
-        domain_name=domain_name,
-        webhook_id=app_data.webhook_id,
-        webhook_token=app_data.token,
-        webhook_secret=app_data.webhook_secret_key,
-    )
+async def validate_domain(saleor_domain: DomainName) -> bool:
     db = next(get_db())
-    db.execute(query)
-    db.commit()
+    db_config = get_domain_config(db, saleor_domain)
+    if db_config:
+        return True
+    return False
 
 
-async def get_webhook_details(domain_name: DomainName) -> WebhookData:
+async def store_app_data(
+    saleor_domain: DomainName, auth_token: str, webhook_data: WebhookData
+):
+    print("Called store_app_data")
+    db = next(get_db())
+    update_domain_config(
+        db,
+        saleor_domain,
+        auth_token,
+        webhook_data.webhook_id,
+        webhook_data.webhook_secret_key,
+    )
+
+
+async def get_webhook_details(saleor_domain: DomainName) -> WebhookData:
+    db = next(get_db())
+    db_config = get_domain_config(db, saleor_domain)
     return WebhookData(
-        token="auth-token",
-        webhook_id="webhook-id",
-        webhook_secret_key="webhook-secret-key",
+        webhook_id=db_config.webhook_id,
+        webhook_secret_key=db_config.webhook_secret,
     )
 
 
 app = SaleorApp(
+    manifest=manifest,
     validate_domain=validate_domain,
     save_app_data=store_app_data,
-    webhook_handlers=webhook_handlers,
-    get_webhook_details=get_webhook_details,
+    use_insecure_saleor_http=settings.debug,
 )
 app.configuration_router.include_router(configuration_router)
 app.include_router(extension_router, prefix="/products")
 app.include_saleor_app_routes()
+app.include_webhook_router(get_webhook_details)
+
+app.webhook_router.http_event_route(SaleorEventType.PRODUCT_CREATED)(product_created)
+app.webhook_router.http_event_route(SaleorEventType.PRODUCT_UPDATED)(product_updated)
+app.webhook_router.http_event_route(SaleorEventType.PRODUCT_DELETED)(product_deleted)
 
 app.add_middleware(
     CORSMiddleware,
