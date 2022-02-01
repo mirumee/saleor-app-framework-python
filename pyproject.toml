@@ -115,5 +115,6 @@ commands =
 depends =
     py38,
     py39,
+    py310
 parallel_show_output = True
 """
