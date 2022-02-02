@@ -1,15 +1,16 @@
 from pathlib import Path
+
 from pydantic import BaseSettings, DirectoryPath
+
+from saleor_app.schemas.core import SaleorPermissions
 from saleor_app.schemas.manifest import (
-    Manifest,
     Extension,
-    ViewType,
-    TargetType,
     ExtensionType,
+    Manifest,
+    TargetType,
+    ViewType,
 )
 from saleor_app.schemas.utils import LazyUrl
-from saleor_app.schemas.core import SaleorPermissions
-
 
 PROJECT_DIR = Path(__file__).parent
 

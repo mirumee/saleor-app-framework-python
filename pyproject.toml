@@ -98,9 +98,9 @@ commands =
 description = check the code style
 basepython = python3.10
 commands =
-    black --diff --check src/saleor_app
-    isort -c -rc --diff src/saleor_app
-    flake8 src/saleor_app
+    black --diff --check src/saleor_app samples/
+    isort -c -rc --diff src/saleor_app samples/
+    flake8 src/saleor_app samples/
 
 [testenv:coverage]
 description = [run locally after tests]: combine coverage data and create report

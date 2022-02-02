@@ -2,7 +2,7 @@ import sys
 
 import uvicorn
 
-from .db import get_db, configuration, get_domain_config
+from .db import configuration, get_db, get_domain_config
 
 
 def add_domain(saleor_domain):
