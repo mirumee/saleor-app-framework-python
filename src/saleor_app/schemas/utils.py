@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from fastapi import Request
 from starlette.routing import NoMatchFound
 
@@ -18,14 +16,13 @@ class LazyUrl(str):
     def validate(cls, v):
         return v
 
-    @cached_property
     def resolve(self):
         return self.request.url_for(self.name)
 
     def __call__(self, request: Request):
         self.request = request
         try:
-            return self.resolve
+            return self.resolve()
         except NoMatchFound:
             raise ConfigurationError(
                 f"Failed to resolve a lazy url, check if an endpoint named '{self.name}' is defined."

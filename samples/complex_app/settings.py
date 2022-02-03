@@ -3,13 +3,7 @@ from pathlib import Path
 from pydantic import BaseSettings, DirectoryPath
 
 from saleor_app.schemas.core import SaleorPermissions
-from saleor_app.schemas.manifest import (
-    Extension,
-    ExtensionType,
-    Manifest,
-    TargetType,
-    ViewType,
-)
+from saleor_app.schemas.manifest import Extension, Manifest, MountType, TargetType
 from saleor_app.schemas.utils import LazyUrl
 
 PROJECT_DIR = Path(__file__).parent
@@ -33,9 +27,8 @@ manifest = Manifest(
         Extension(
             url=LazyUrl("custom-add-product"),
             label="Custom Product Create",
-            view=ViewType.PRODUCT,
-            type=ExtensionType.OVERVIEW,
-            target=TargetType.CREATE,
+            mount=MountType.PRODUCT_OVERVIEW_CREATE,
+            target=TargetType.POPUP,
             permissions=[
                 SaleorPermissions.MANAGE_PRODUCTS,
             ],
