@@ -6,24 +6,26 @@ from pydantic import AnyHttpUrl, BaseModel, Field
 from saleor_app.schemas.utils import LazyUrl
 
 
-class ViewType(str, Enum):
-    PRODUCT = "PRODUCT"
-
-
-class ExtensionType(str, Enum):
-    OVERVIEW = "OVERVIEW"
-    DETAILS = "DETAILS"
-
-
 class TargetType(str, Enum):
-    MORE_ACTIONS = "MORE-ACTIONS"
-    CREATE = "CREATE"
+    POPUP = "POPUP"
+    APP_PAGE = "APP_PAGE"
+
+
+class MountType(str, Enum):
+    PRODUCT_DETAILS_MORE_ACTIONS = "PRODUCT_DETAILS_MORE_ACTIONS"
+    PRODUCT_OVERVIEW_CREATE = "PRODUCT_OVERVIEW_CREATE"
+    PRODUCT_OVERVIEW_MORE_ACTIONS = "PRODUCT_OVERVIEW_MORE_ACTIONS"
+    NAVIGATION_CATALOG = "NAVIGATION_CATALOG"
+    NAVIGATION_ORDERS = "NAVIGATION_ORDERS"
+    NAVIGATION_CUSTOMERS = "NAVIGATION_CUSTOMERS"
+    NAVIGATION_DISCOUNTS = "NAVIGATION_DISCOUNTS"
+    NAVIGATION_TRANSLATIONS = "NAVIGATION_TRANSLATIONS"
+    NAVIGATION_PAGES = "NAVIGATION_PAGES"
 
 
 class Extension(BaseModel):
     label: str
-    view: ViewType
-    type: ExtensionType
+    mount: MountType
     target: TargetType
     permissions: List[str]
     url: Union[AnyHttpUrl, LazyUrl]

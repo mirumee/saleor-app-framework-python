@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 from fastapi import Depends, Request
@@ -9,6 +10,8 @@ from saleor_app.install import install_app
 from saleor_app.saleor.exceptions import GraphQLError
 from saleor_app.schemas.core import InstallData
 from saleor_app.schemas.utils import LazyUrl
+
+logger = logging.getLogger(__name__)
 
 
 async def manifest(request: Request):
@@ -50,7 +53,8 @@ async def install(
                 events=events,
                 use_insecure_saleor_http=request.app.use_insecure_saleor_http,
             )
-        except (InstallAppError, GraphQLError):
+        except (InstallAppError, GraphQLError) as exc:
+            logger.debug(str(exc), exc_info=1)
             raise HTTPException(
                 status_code=403, detail="Incorrect token or not enough permissions"
             )

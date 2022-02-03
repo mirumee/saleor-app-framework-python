@@ -35,9 +35,8 @@ def manifest():
         extensions=[
             Extension(
                 label="Custom Product Create",
-                view="PRODUCT",
-                type="OVERVIEW",
-                target="CREATE",
+                mount="PRODUCT_OVERVIEW_CREATE",
+                target="POPUP",
                 permissions=["MANAGE_PRODUCTS"],
                 url=LazyUrl("extension"),
             )
