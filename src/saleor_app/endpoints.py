@@ -22,7 +22,9 @@ from saleor_app.schemas.manifest import Manifest
 
 async def manifest(request: Request, settings=Depends(get_settings)):
     manifest = settings.manifest.dict(by_alias=True)
-    manifest["appUrl"] = ""
+    manifest["appUrl"] = request.url_for(
+        manifest.pop("app_url_for")
+    )
     manifest["tokenTargetUrl"] = request.url_for("app-install")
     manifest["configurationUrl"] = request.url_for(
         manifest.pop("configuration_url_for")
