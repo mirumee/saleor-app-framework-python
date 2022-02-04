@@ -5,7 +5,7 @@ import pytest
 from saleor_app.app import SaleorApp
 from saleor_app.schemas.handlers import SaleorEventType, SQSUrl
 from saleor_app.schemas.manifest import Extension, Manifest
-from saleor_app.schemas.utils import LazyUrl
+from saleor_app.schemas.utils import LazyPath, LazyUrl
 from saleor_app.settings import AWSSettings
 
 
@@ -31,14 +31,14 @@ def manifest():
         support_url="http://172.17.0.1:5000/supportUrl",
         id="saleor-simple-sample",
         permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
-        configuration_url=LazyUrl("configuration-form"),
+        app_url=LazyUrl("configuration-form"),
         extensions=[
             Extension(
                 label="Custom Product Create",
                 mount="PRODUCT_OVERVIEW_CREATE",
                 target="POPUP",
                 permissions=["MANAGE_PRODUCTS"],
-                url=LazyUrl("extension"),
+                url=LazyPath("extension"),
             )
         ],
     )

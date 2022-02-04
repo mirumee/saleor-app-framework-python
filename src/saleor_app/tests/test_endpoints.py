@@ -15,10 +15,10 @@ async def test_manifest(saleor_app):
         response = await ac.get("configuration/manifest")
 
     manifest = saleor_app.manifest.dict(by_alias=True)
-    manifest["appUrl"] = ""
+    manifest["appUrl"] = f"{base_url}/configuration"
     manifest["tokenTargetUrl"] = f"{base_url}/configuration/install"
-    manifest["configurationUrl"] = f"{base_url}/configuration"
-    manifest["extensions"][0]["url"] = f"{base_url}/extension"
+    manifest["configurationUrl"] = None
+    manifest["extensions"][0]["url"] = "/extension"
 
     manifest = json.loads(json.dumps(Manifest(**manifest).dict(by_alias=True)))
 

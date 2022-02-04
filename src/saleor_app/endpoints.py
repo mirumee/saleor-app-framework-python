@@ -22,7 +22,6 @@ async def manifest(request: Request):
     for extension in manifest.extensions:
         if isinstance(extension.url, LazyUrl):
             extension.url = extension.url(request)
-    manifest.app_url = ""
     return manifest
 
 
@@ -33,7 +32,10 @@ async def install(
     saleor_domain=Depends(saleor_domain_header),
 ):
     events = defaultdict(list)
-    if request.app.webhook_router.http_routes:
+    if (
+        hasattr(request.app, "webhook_router")
+        and request.app.webhook_router.http_routes
+    ):
         events[request.url_for("handle-webhook")] = list(
             request.app.webhook_router.http_routes.keys()
         )

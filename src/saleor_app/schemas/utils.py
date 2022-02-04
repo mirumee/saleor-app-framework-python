@@ -5,6 +5,11 @@ from saleor_app.errors import ConfigurationError
 
 
 class LazyUrl(str):
+    """
+    Used to declare a fully qualified url that is to be resolved when the
+    request is available.
+    """
+
     def __init__(self, name: str):
         self.name = name
 
@@ -42,3 +47,17 @@ class LazyUrl(str):
 
     def __repr__(self):
         return str(self)
+
+
+class LazyPath(LazyUrl):
+    """
+    Much like LazyUrl but resolves only to the path part of an url.
+    The lazy aspect of this class is very redundant but is built like so to
+    maintain the same usage as the LazyUrl class.
+    """
+
+    def resolve(self):
+        return self.request.app.url_path_for(self.name)
+
+    def __str__(self):
+        return f"LazyPath('{self.name}')"
