@@ -7,12 +7,12 @@ from pydantic import BaseModel, BaseSettings
 from starlette.middleware.cors import CORSMiddleware
 
 from saleor_app.app import SaleorApp
-from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.deps import (
     ConfigurationDataDeps,
     ConfigurationFormDeps,
     saleor_domain_header,
 )
+from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import SaleorEventType
 from saleor_app.schemas.manifest import Manifest
 from saleor_app.schemas.utils import LazyUrl

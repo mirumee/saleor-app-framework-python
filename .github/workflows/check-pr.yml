@@ -1,16 +1,13 @@
-name: documentation
-on:
-  push:
-    branches:
-      - main
-
-env:
-  PYTHON_VERSION: 3.10.2
+name: check_build
+on: pull_request
 
 jobs:
   documentation:
-    name: Build documentation
+    name: Check Pull request
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
     steps:
 
       - name: Checkout repository
@@ -19,7 +16,7 @@ jobs:
       - name: Set up Python runtime
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install poetry
         run: |
@@ -39,7 +36,18 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
 
-      - name: Deploy documentation
+      - name: Run linters
         run: |
-          poetry run mkdocs gh-deploy --force
-          poetry run mkdocs --version
+          poetry run black --check src/saleor_app/ samples/
+          poetry run isort --check src/saleor_app/ samples/
+          poetry run flake8 src/saleor_app/ samples/
+
+      - name: Run docs build test
+        run: poetry run mkdocs build -s
+
+      - name: Run unit tests
+        run: |
+          poetry run coverage erase
+          poetry run coverage run --source="saleor_app" -p -m pytest src/saleor_app
+          poetry run coverage combine
+          poetry run coverage report --fail-under=90

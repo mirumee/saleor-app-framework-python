@@ -1,4 +1,5 @@
 import json
+
 from fastapi import APIRouter
 from fastapi.param_functions import Depends
 from fastapi.responses import PlainTextResponse
@@ -15,9 +16,7 @@ class ConfigurationData(BaseModel):
 router = APIRouter()
 
 
-@router.get(
-    "/", response_class=PlainTextResponse, name="configuration-form"
-)
+@router.get("/", response_class=PlainTextResponse, name="configuration-form")
 async def get_public_form(commons: ConfigurationFormDeps = Depends()):
     context = {
         "request": str(commons.request),

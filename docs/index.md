@@ -88,7 +88,7 @@ When Saleor is authorized to install the app an authentication key is issued, th
 
 ```python linenums="1" hl_lines="2 11-17 38"
 {!./docs/../samples/simple_app/app.py[ln:9]!}
-{!./docs/../samples/simple_app/app.py[ln:10]!}
+{!./docs/../samples/simple_app/app.py[ln:15]!}
 {!./docs/../samples/simple_app/app.py[ln:17]!}
 {!./docs/../samples/simple_app/app.py[ln:18]!}
 
@@ -116,8 +116,8 @@ import json
 {!./docs/../samples/simple_app/app.py[ln:4-5]!}
 
 {!./docs/../samples/simple_app/app.py[ln:9]!}
-{!./docs/../samples/simple_app/app.py[ln:10]!}
 from saleor_app.deps import ConfigurationFormDeps
+{!./docs/../samples/simple_app/app.py[ln:15]!}
 {!./docs/../samples/simple_app/app.py[ln:17]!}
 {!./docs/../samples/simple_app/app.py[ln:18]!}
 

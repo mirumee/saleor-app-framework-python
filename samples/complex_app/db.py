@@ -47,12 +47,18 @@ def get_domain_config(db, saleor_domain: str):
     )
 
 
-def update_domain_config(db, saleor_domain: str, auth_token: str, webhook_id: str, webhook_secret: str):
+def update_domain_config(
+    db, saleor_domain: str, auth_token: str, webhook_id: str, webhook_secret: str
+):
     db_config = get_domain_config(db, saleor_domain)
-    stmt = configuration.update().where(configuration.c.id == db_config.id).values(
-        auth_token=auth_token,
-        webhook_id=webhook_id,
-        webhook_secret=webhook_secret,
+    stmt = (
+        configuration.update()
+        .where(configuration.c.id == db_config.id)
+        .values(
+            auth_token=auth_token,
+            webhook_id=webhook_id,
+            webhook_secret=webhook_secret,
+        )
     )
     db.execute(stmt)
     db.commit()

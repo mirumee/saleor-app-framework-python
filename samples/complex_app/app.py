@@ -5,11 +5,11 @@ from saleor_app.app import SaleorApp
 from saleor_app.schemas.core import DomainName, WebhookData
 from saleor_app.schemas.handlers import SaleorEventType
 
+from .db import get_db, get_domain_config, update_domain_config
 from .endpoints.configuration import router as configuration_router
-from .db import configuration, get_db, get_domain_config, update_domain_config
 from .endpoints.extension import router as extension_router
-from .settings import settings, manifest
-from .webhooks import product_created, product_updated, product_deleted
+from .settings import manifest, settings
+from .webhooks import product_created, product_deleted, product_updated
 
 
 async def validate_domain(saleor_domain: DomainName) -> bool:
