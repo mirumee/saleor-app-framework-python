@@ -22,7 +22,6 @@ async def manifest(request: Request):
     for extension in manifest.extensions:
         if isinstance(extension.url, LazyUrl):
             extension.url = extension.url(request)
-    manifest.app_url = ""
     return manifest
 
 
