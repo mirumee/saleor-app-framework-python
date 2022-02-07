@@ -47,7 +47,6 @@ class BaseSettingsManifest(BaseModel):
     support_url: str = Field(..., alias="supportUrl")
     id: str
     permissions: List[str]
-    app_url: Optional[str] = Field(default=None, alias="appUrl")
     extensions: List[SettingsExtension]
 
     class Config:
@@ -55,11 +54,12 @@ class BaseSettingsManifest(BaseModel):
 
 
 class SettingsManifest(BaseSettingsManifest):
-    configuration_url_for: str
+    app_url_for: str
+    configuration_url_for: Optional[str]
 
 
 class Manifest(BaseSettingsManifest):
     app_url: str = Field(..., alias="appUrl")
-    configuration_url: str = Field(..., alias="configurationUrl")
+    configuration_url: Optional[str] = Field(None, alias="configurationUrl")
     token_target_url: str = Field(..., alias="tokenTargetUrl")
     extensions: List[Extension]
