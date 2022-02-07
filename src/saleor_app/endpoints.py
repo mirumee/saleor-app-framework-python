@@ -32,16 +32,14 @@ async def install(
     saleor_domain=Depends(saleor_domain_header),
 ):
     events = defaultdict(list)
-    if (
-        hasattr(request.app, "webhook_router")
-        and request.app.webhook_router.http_routes
-    ):
-        events[request.url_for("handle-webhook")] = list(
-            request.app.webhook_router.http_routes.keys()
-        )
-    for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
-        key = str(sqs_handler.target_url)
-        events[key].append(event_type)
+    if hasattr(request.app, "webhook_router"):
+        if request.app.webhook_router.http_routes:
+            events[request.url_for("handle-webhook")] = list(
+                request.app.webhook_router.http_routes.keys()
+            )
+        for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
+            key = str(sqs_handler.target_url)
+            events[key].append(event_type)
 
     if events:
         try:
