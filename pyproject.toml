@@ -8,7 +8,7 @@ authors = [ "Saleor Commerce <hello@saleor.io>" ]
 python = "^3.8"
 fastapi = "^0"
 uvicorn = "^0"
-Jinja2 = "^2"
+Jinja2 = "jinja2 >=2.11.2,<4.0.0"
 aiofiles = "^0"
 aiohttp = "^3.8"
 jwt = "^1"
@@ -28,9 +28,9 @@ tox = "^3"
 tox-poetry = "^0"
 ipdb = "^0"
 httpx = "^0"
-pytest-mock = "^3.6.1"
-mkdocs-material = "^8.1.6"
-mdx-include = "^1.4.1"
+pytest-mock = "^3"
+mkdocs-material = "^8"
+mdx-include = "^1"
 
 [tool.poetry.extras]
 sqs = ["boto3"]
