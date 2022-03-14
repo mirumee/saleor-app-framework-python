@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 
 class GraphQLError(Exception):
@@ -21,7 +21,7 @@ class GraphQLError(Exception):
 
 
 class IgnoredPrincipal(Exception):
-    message = "Ignore webhook with {} principal."
+    message = "Ignore webhook with {} principal ids."
 
-    def __init__(self, principal_id):
-        super().__init__(self.message.format(principal_id))
+    def __init__(self, principal_ids: List[str]):
+        super().__init__(self.message.format(",".join(principal_ids)))
