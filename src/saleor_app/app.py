@@ -14,7 +14,7 @@ class SaleorApp(FastAPI):
         *,
         manifest: Manifest,
         validate_domain: Callable[[DomainName], Awaitable[bool]],
-        save_app_data: Callable[[DomainName, WebhookData], Awaitable],
+        save_app_data: Callable[[DomainName, str, WebhookData], Awaitable],
         use_insecure_saleor_http: bool = False,
         development_auth_token: Optional[str] = None,
         **kwargs,
