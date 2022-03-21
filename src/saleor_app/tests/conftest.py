@@ -113,3 +113,21 @@ def saleor_app_with_webhooks(saleor_app, get_webhook_details, webhook_handler):
 @pytest.fixture
 def mock_request(saleor_app):
     return Mock(app=saleor_app, body=AsyncMock(return_value=b"request_body"))
+
+
+@pytest.fixture
+def mock_request_with_metadata(saleor_app):
+    return AsyncMock(
+        app=saleor_app,
+        json=AsyncMock(
+            return_value=[
+                {
+                    "meta": {
+                        "issued_at": "2022-03-09T14:42:00.756412+00:00",
+                        "version": "3.1.0-a.25",
+                        "issuing_principal": {"id": "VXNlcjox", "type": "user"},
+                    }
+                }
+            ]
+        ),
+    )
