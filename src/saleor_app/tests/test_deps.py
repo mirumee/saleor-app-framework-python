@@ -5,8 +5,10 @@ import pytest
 from fastapi import HTTPException
 
 from saleor_app.deps import (
+    saleor_app_token,
     saleor_domain_header,
     saleor_token,
+    verify_saleor_app_token,
     verify_saleor_domain,
     verify_saleor_token,
     verify_webhook_signature,
@@ -119,3 +121,52 @@ async def test_verify_webhook_signature_invalid(
         await verify_webhook_signature(mock_request, "BAD_signature", "saleor_domain")
 
     assert excinfo.value.detail == "Invalid webhook signature for x-saleor-signature"
+
+
+async def test_app_saleor_token(mock_request):
+    assert await saleor_app_token(mock_request, "token") == "token"
+
+
+async def test_saleor_app_token_from_settings(mock_request):
+    assert await saleor_app_token(mock_request, None) == "test_token"
+
+
+async def test_saleor_app_token_missing(mock_request):
+    mock_request.app.development_auth_token = None
+    with pytest.raises(HTTPException) as excinfo:
+        assert await saleor_app_token(mock_request, None) == "test_token"
+
+    assert str(excinfo.value.detail) == "Missing X-SALEOR-APP-TOKEN header."
+
+
+async def test_verify_saleor_app_token(mock_request, mocker):
+    mock_saleor_client = AsyncMock(SaleorClient)
+    mock_saleor_client.__aenter__.return_value.execute.return_value = {
+        "appTokenVerify": {"valid": True}
+    }
+    mocker.patch("saleor_app.deps.get_client_for_app", return_value=mock_saleor_client)
+    assert await verify_saleor_app_token(mock_request, "saleor_domain", "token")
+
+
+async def test_verify_saleor_app_token_invalid(mock_request, mocker):
+    mock_saleor_client = AsyncMock(SaleorClient)
+    mock_saleor_client.__aenter__.return_value.execute.return_value = {
+        "appTokenVerify": {"valid": False}
+    }
+    mocker.patch("saleor_app.deps.get_client_for_app", return_value=mock_saleor_client)
+    with pytest.raises(HTTPException) as excinfo:
+        assert await verify_saleor_app_token(mock_request, "saleor_domain", "token")
+
+    assert (
+        excinfo.value.detail
+        == "Provided X-SALEOR-DOMAIN and X-SALEOR-APP-TOKEN are incorrect."
+    )
+
+
+async def test_app_verify_saleor_token_saleor_error(mock_request, mocker):
+    mock_saleor_client = AsyncMock(SaleorClient)
+    mock_saleor_client.__aenter__.return_value.execute.side_effect = GraphQLError(
+        "error"
+    )
+    mocker.patch("saleor_app.deps.get_client_for_app", return_value=mock_saleor_client)
+    assert not await verify_saleor_app_token(mock_request, "saleor_domain", "token")

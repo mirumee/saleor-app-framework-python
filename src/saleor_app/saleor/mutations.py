@@ -25,3 +25,12 @@ mutation TokenVerify($token: String!) {
 }
 
 """
+
+VERIFY_APP_TOKEN = """
+mutation AppTokenVerify($token: String!) {
+  appTokenVerify(token: $token) {
+    valid
+  }
+}
+
+"""
