@@ -33,6 +33,11 @@ class SaleorClient:
     ) -> None:
         await self.close()
 
+    async def get_jwks(self):
+        async with self.session.get(url="/.well-known/jwks.json") as resp:
+            resp.raise_for_status()
+            return await resp.json()
+
     async def execute(self, query, variables=None):
         async with self.session.post(
             url="/graphql/", json={"query": query, "variables": variables}

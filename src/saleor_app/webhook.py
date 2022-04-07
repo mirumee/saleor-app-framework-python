@@ -1,14 +1,9 @@
 from typing import Callable, List
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request, Security
 from fastapi.routing import APIRoute
 from starlette.responses import Response
 
-from saleor_app.deps import (
-    saleor_domain_header,
-    verify_saleor_domain,
-    verify_webhook_signature,
-)
 from saleor_app.schemas.handlers import (
     SaleorEventType,
     SQSHandler,
@@ -16,6 +11,7 @@ from saleor_app.schemas.handlers import (
     WebHookHandlerSignature,
 )
 from saleor_app.schemas.webhook import Webhook
+from saleor_app.security import saleor_webhook_security
 
 SALEOR_EVENT_HEADER = "x-saleor-event"
 
@@ -45,10 +41,8 @@ class WebhookRouter(APIRouter):
 
     async def __handle_webhook_stub(
         request: Request,
-        payload: List[Webhook],  # FIXME provide a way to proper define payload types
-        saleor_domain=Depends(saleor_domain_header),
-        _verify_saleor_domain=Depends(verify_saleor_domain),
-        _verify_webhook_signature=Depends(verify_webhook_signature),
+        payload: List[Webhook],
+        _verify_webhook_signature=Security(saleor_webhook_security),
         _event_type=Header(None, alias=SALEOR_EVENT_HEADER),
     ):
         """
@@ -64,8 +58,7 @@ class WebhookRouter(APIRouter):
                 "",
                 func,
                 dependencies=[
-                    Depends(verify_saleor_domain),
-                    Depends(verify_webhook_signature),
+                    Security(saleor_webhook_security),
                 ],
             )
 
