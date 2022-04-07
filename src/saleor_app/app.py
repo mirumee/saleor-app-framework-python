@@ -1,9 +1,9 @@
-from typing import Awaitable, Callable, Optional
+from typing import Awaitable, Callable
 
 from fastapi import APIRouter, FastAPI
 
 from saleor_app.endpoints import install, manifest
-from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.core import Saleor, WebhookData
 from saleor_app.schemas.manifest import Manifest
 from saleor_app.webhook import WebhookRoute, WebhookRouter
 
@@ -13,10 +13,10 @@ class SaleorApp(FastAPI):
         self,
         *,
         manifest: Manifest,
-        validate_domain: Callable[[DomainName], Awaitable[bool]],
-        save_app_data: Callable[[DomainName, str, WebhookData], Awaitable],
+        validate_domain: Callable[[Saleor], Awaitable[bool]],
+        save_app_data: Callable[[Saleor, str, WebhookData], Awaitable],
+        get_saleor_jwks: Callable[[Saleor], Awaitable],
         use_insecure_saleor_http: bool = False,
-        development_auth_token: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -24,10 +24,10 @@ class SaleorApp(FastAPI):
         self.manifest = manifest
 
         self.validate_domain = validate_domain
+        self.get_saleor_jwks = get_saleor_jwks
         self.save_app_data = save_app_data
 
         self.use_insecure_saleor_http = use_insecure_saleor_http
-        self.development_auth_token = development_auth_token
 
         self.configuration_router = APIRouter(
             prefix="/configuration", tags=["configuration"]
@@ -49,7 +49,7 @@ class SaleorApp(FastAPI):
         self.include_router(self.configuration_router)
 
     def include_webhook_router(
-        self, get_webhook_details: Callable[[DomainName], Awaitable[WebhookData]]
+        self, get_webhook_details: Callable[[Saleor], Awaitable[WebhookData]]
     ):
         self.get_webhook_details = get_webhook_details
         self.webhook_router = WebhookRouter(
