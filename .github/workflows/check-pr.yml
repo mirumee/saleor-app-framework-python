@@ -7,9 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -24,7 +23,7 @@ jobs:
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
           poetry config --list
-          
+
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v2
@@ -38,9 +37,9 @@ jobs:
 
       - name: Run linters
         run: |
-          poetry run black --check src/saleor_app/ samples/
-          poetry run isort --check src/saleor_app/ samples/
-          poetry run flake8 src/saleor_app/ samples/
+          poetry run black --check src/saleor_app/
+          poetry run isort --check src/saleor_app/
+          poetry run flake8 src/saleor_app/
 
       - name: Run docs build test
         run: poetry run mkdocs build -s
