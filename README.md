@@ -3,6 +3,7 @@
 Saleor App Framework (Python) provides an easy way to install Your app into the [Saleor Commerce](https://github.com/saleor/saleor).
 
 Supported features:
+
 - Installation
 - Webhooks handling
 - Exception handling
@@ -15,13 +16,15 @@ More on usage You can find in the official [Documentation](https://mirumee.githu
 To use saleor app framework simply install it by
 
 Using [poetry](https://python-poetry.org/)
+
 ```
 poetry add git+https://github.com/saleor/saleor-app-framework-python.git@main
 ```
 
 Using pip
+
 ```
-pip install git+https://github.com/saleor/saleor-app-framework-python.git@main 
+pip install git+https://github.com/saleor/saleor-app-framework-python.git@main
 ```
 
 ## Usage
@@ -29,19 +32,20 @@ pip install git+https://github.com/saleor/saleor-app-framework-python.git@main
 The recommended way of building Saleor Python Applications using this framework, is to use project template from [saleor-app-template](https://github.com/mirumee/saleor-app-template). This template will save You a lot of time configuring Your project.
 
 It is preconfigured to use:
-- [guvicorn](https://gunicorn.org/) - as HTTP server
+
+- uvicorn [[and gunicorn](https://gunicorn.org/)] - as HTTP server
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/14/core/) - as an ORM
 - [alembic](https://alembic.sqlalchemy.org/en/latest/) - as a database migration tool with configured migration names, black and isort
 - [encode/databases](https://www.encode.io/databases/) - as an asyncio support for SQLAlchemy
 - [pytest](https://docs.pytest.org/en/7.1.x/) - for unit tests
 - [poetry](https://python-poetry.org/) - as python package manager
 
-
 With this template You will get:
+
 - working Dockerfile and docker-compose.yaml
 - working database with async support
 - working configured tests
-- working Saleor installation process 
+- working Saleor installation process
 
 You can always develop Your own application from scratch, basing on the steps from [Documentation](https://mirumee.github.io/saleor-app-framework-python/) or change any of the existing tools.
 
@@ -49,7 +53,7 @@ You can always develop Your own application from scratch, basing on the steps fr
 
 ## Development
 
-### Tox 
+### Tox
 
 To execeute tests with tox just invoke `tox` or `tox -p`. The tox-poetry plugin will read pyproject.toml and handle the envs creation. In case of a change in the dependencies you can force a recreation of the envs with `tox -r`.
 
