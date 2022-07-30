@@ -12,32 +12,18 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python runtime
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+        uses: actions/checkout@v3
 
       - name: Install poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          poetry config --list
-          
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v2
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        run: pipx install poetry
 
-      - name: Install Python dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - run: poetry install
 
       - name: Deploy documentation
         run: |
