@@ -4,12 +4,13 @@ import logging
 from typing import List, Optional
 
 import jwt
+from jwt.exceptions import JWTDecodeError
 from fastapi import Depends, Header, HTTPException, Query, Request
 
 from saleor_app.saleor.exceptions import GraphQLError
 from saleor_app.saleor.mutations import VERIFY_TOKEN
 from saleor_app.saleor.utils import get_client_for_app
-from saleor_app.schemas.core import DomainName
+from saleor_app.schemas.core import DomainName, SaleorPermissions
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +122,7 @@ async def verify_webhook_signature(
         )
 
 
-def require_permission(permissions: List):
+def require_permission(permissions: List[SaleorPermissions]):
     """
     Validates is the requesting principal is authorized for the specified action
 
@@ -133,11 +134,13 @@ def require_permission(permissions: List):
     """
 
     async def func(
-        saleor_domain=Depends(saleor_domain_header),
-        saleor_token=Depends(saleor_token),
+        token=Depends(saleor_token),
         _token_is_valid=Depends(verify_saleor_token),
     ):
-        jwt_payload = jwt.decode(saleor_token, verify=False)
+        try:
+            jwt_payload = jwt.JWT().decode(token, do_verify=False)
+        except JWTDecodeError as exc:
+            raise HTTPException(status_code=400, detail=f"JWT decode error: {exc}")
         user_permissions = set(jwt_payload.get("permissions", []))
         if not set([p.value for p in permissions]) - user_permissions:
             return True
