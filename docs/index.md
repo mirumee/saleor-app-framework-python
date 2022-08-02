@@ -11,7 +11,7 @@ The only supported web framework is **FastAPI**.
 Using Poetry (recommended, [:material-file-link: installing poetry](https://python-poetry.org/docs/#installation){ target=_blank }):
 
 ```bash
-poetry add git+https://github.com/saleor/saleor-app-framework-python.git@main
+poetry add git+https://github.com/mirumee/saleor-app-framework-python.git@main
 # (1)
 ```
 
@@ -20,7 +20,7 @@ poetry add git+https://github.com/saleor/saleor-app-framework-python.git@main
 Using Pip:
 
 ```bash
-pip install git+https://github.com/saleor/saleor-app-framework-python.git@main 
+pip install git+https://github.com/mirumee/saleor-app-framework-python.git@main 
 ```
 
 ### Create the Saleor app
@@ -28,9 +28,9 @@ pip install git+https://github.com/saleor/saleor-app-framework-python.git@main
 To run your Saleor App you can use the ```#!python SaleorApp``` class which overloads the usual ```#!python FastAPI``` class.
 
 ```python linenums="1"
-{!./docs/../samples/simple_app/app.py[ln:9]!}
+from saleor_app.app import SaleorApp
 
-{!./docs/../samples/simple_app/app.py[ln:77]!}
+app = SaleorApp(
     # more arguments to come
 )
 ```
@@ -42,15 +42,28 @@ You can use the ```#!python app``` instance as you would normally use the standa
 As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/developer/extending/apps/manifest){ target=_blank } an app needs a manifest, the framework provides a Pydantic representation of that which needs to be provided when initializing the app.
 
 ```python linenums="1" hl_lines="2-3 6-18 22"
-{!./docs/../samples/simple_app/app.py[ln:9]!}
-{!./docs/../samples/simple_app/app.py[ln:17]!}
-{!./docs/../samples/simple_app/app.py[ln:18]!}
+from saleor_app.app import SaleorApp
+from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.utils import LazyUrl
 
 
-{!./docs/../samples/simple_app/app.py[ln:62-74]!}
+manifest = Manifest(
+    name="Sample Saleor App",
+    version="0.1.0",
+    about="Sample Saleor App seving as an example.",
+    data_privacy="",
+    data_privacy_url="http://samle-saleor-app.example.com/dataPrivacyUrl",
+    homepage_url="http://samle-saleor-app.example.com/homepageUrl",
+    support_url="http://samle-saleor-app.example.com/supportUrl",
+    id="saleor-simple-sample",
+    permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+    configuration_url=LazyUrl("configuration-form"),
+    extensions=[],
+)
 
 
-{!./docs/../samples/simple_app/app.py[ln:77-78]!}
+app = SaleorApp(
+    manifest=manifest,
     # more arguments to come
 )
 ```
@@ -64,19 +77,34 @@ As described in [:saleor-saleor: App manifest](https://docs.saleor.io/docs/3.0/d
 3rd Patry Apps work in a multi-tenant fashion - one app service can serve multiple Saleor instances. To prevent any Saleor instance from using your app the app need to authorize a Saleor instance that's done by a simple function that can be as simple as comparing the incoming Saleor domain or as complex to check the allowed domains in a database.
 
 ```python linenums="1" hl_lines="2 7-8 28"
-{!./docs/../samples/simple_app/app.py[ln:9]!}
+from saleor_app.app import SaleorApp
 from saleor_app.schemas.core import DomainName
-{!./docs/../samples/simple_app/app.py[ln:17]!}
-{!./docs/../samples/simple_app/app.py[ln:18]!}
+from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.utils import LazyUrl
 
 
-{!./docs/../samples/simple_app/app.py[ln:38-39]!}
+async def validate_domain(saleor_domain: DomainName) -> bool:
+    return saleor_domain == "172.17.0.1:8000"
 
 
-{!./docs/../samples/simple_app/app.py[ln:62-74]!}
+manifest = Manifest(
+    name="Sample Saleor App",
+    version="0.1.0",
+    about="Sample Saleor App seving as an example.",
+    data_privacy="",
+    data_privacy_url="http://samle-saleor-app.example.com/dataPrivacyUrl",
+    homepage_url="http://samle-saleor-app.example.com/homepageUrl",
+    support_url="http://samle-saleor-app.example.com/supportUrl",
+    id="saleor-simple-sample",
+    permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+    configuration_url=LazyUrl("configuration-form"),
+    extensions=[],
+)
 
 
-{!./docs/../samples/simple_app/app.py[ln:77-79]!}
+app = SaleorApp(
+    manifest=manifest,
+    validate_domain=validate_domain,
     # more arguments to come
 )
 ```
@@ -86,20 +114,46 @@ from saleor_app.schemas.core import DomainName
 
 When Saleor is authorized to install the app an authentication key is issued, that key needs to be securely stored by the app as it provides as much access as the app requested in the manifest.
 
-```python linenums="1" hl_lines="2 11-17 38"
-{!./docs/../samples/simple_app/app.py[ln:9]!}
-{!./docs/../samples/simple_app/app.py[ln:15]!}
-{!./docs/../samples/simple_app/app.py[ln:17]!}
-{!./docs/../samples/simple_app/app.py[ln:18]!}
+```python linenums="1" hl_lines="2 11-17 39"
+from saleor_app.app import SaleorApp
+from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.utils import LazyUrl
 
 
-{!./docs/../samples/simple_app/app.py[ln:38-48]!} #(1)
+async def validate_domain(saleor_domain: DomainName) -> bool:
+    return saleor_domain == "172.17.0.1:8000"
 
 
-{!./docs/../samples/simple_app/app.py[ln:62-74]!}
+async def store_app_data(
+    saleor_domain: DomainName, auth_token: str, webhook_data: WebhookData
+):
+    print("Called store_app_data")
+    print(saleor_domain)
+    print(auth_token)
+    print(webhook_data) #
 
 
-{!./docs/../samples/simple_app/app.py[ln:77-80]!}
+
+manifest = Manifest(
+    name="Sample Saleor App",
+    version="0.1.0",
+    about="Sample Saleor App serving as an example.",
+    data_privacy="",
+    data_privacy_url="http://sample-saleor-app.example.com/dataPrivacyUrl",
+    homepage_url="http://sample-saleor-app.example.com/homepageUrl",
+    support_url="http://sample-saleor-app.example.com/supportUrl",
+    id="saleor-simple-sample",
+    permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+    configuration_url=LazyUrl("configuration-form"),
+    extensions=[],
+)
+
+
+app = SaleorApp(
+    manifest=manifest,
+    validate_domain=validate_domain,
+    save_app_data=store_app_data, # (1)
 )
 ```
 
@@ -113,31 +167,67 @@ To finalize, you need to provide the endpoint named ```#!python configuration-fo
 ```python linenums="1" hl_lines="1 3-4 8 48-100"
 import json
 
-{!./docs/../samples/simple_app/app.py[ln:4-5]!}
+from fastapi.param_functions import Depends
+from fastapi.responses import HTMLResponse, PlainTextResponse
 
-{!./docs/../samples/simple_app/app.py[ln:9]!}
+from saleor_app.app import SaleorApp
 from saleor_app.deps import ConfigurationFormDeps
-{!./docs/../samples/simple_app/app.py[ln:15]!}
-{!./docs/../samples/simple_app/app.py[ln:17]!}
-{!./docs/../samples/simple_app/app.py[ln:18]!}
+from saleor_app.schemas.core import DomainName, WebhookData
+from saleor_app.schemas.manifest import Manifest
+from saleor_app.schemas.utils import LazyUrl
 
 
-{!./docs/../samples/simple_app/app.py[ln:38-48]!} 
+async def validate_domain(saleor_domain: DomainName) -> bool:
+    return saleor_domain == "172.17.0.1:8000"
 
 
-{!./docs/../samples/simple_app/app.py[ln:62-74]!}
+async def store_app_data(
+    saleor_domain: DomainName, auth_token: str, webhook_data: WebhookData
+):
+    print("Called store_app_data")
+    print(saleor_domain)
+    print(auth_token)
+    print(webhook_data) 
 
 
-{!./docs/../samples/simple_app/app.py[ln:77-80]!}
+manifest = Manifest(
+    name="Sample Saleor App",
+    version="0.1.0",
+    about="Sample Saleor App seving as an example.",
+    data_privacy="",
+    data_privacy_url="http://samle-saleor-app.example.com/dataPrivacyUrl",
+    homepage_url="http://samle-saleor-app.example.com/homepageUrl",
+    support_url="http://samle-saleor-app.example.com/supportUrl",
+    id="saleor-simple-sample",
+    permissions=["MANAGE_PRODUCTS", "MANAGE_USERS"],
+    configuration_url=LazyUrl("configuration-form"),
+    extensions=[],
 )
 
 
-{!./docs/../samples/simple_app/app.py[ln:107-116]!}
+app = SaleorApp(
+    manifest=manifest,
+    validate_domain=validate_domain,
+    save_app_data=store_app_data,
+)
 
 
-{!./docs/../samples/simple_app/app.py[ln:124]!} #(1)
+@app.configuration_router.get(
+    "/", response_class=HTMLResponse, name="configuration-form"
+)
+async def get_public_form(commons: ConfigurationFormDeps = Depends()):
+    context = {
+        "request": str(commons.request),
+        "form_url": str(commons.request.url),
+        "saleor_domain": commons.saleor_domain,
+    }
+    return PlainTextResponse(json.dumps(context, indent=4)) # (1)
+
+
+app.include_saleor_app_routes() # (2)
 ```
 
+1. This view would normally return a UI that will be rendered in the Dashboard
 1. Once you are done defining all the configuration routes you need to tell the app to load them
 
 > This is a complete example that will work as is.
