@@ -2,9 +2,9 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-DomainName = str
-AppToken = str
-Url = str
+
+class Saleor(BaseModel):
+    domain: str
 
 
 class WebhookData(BaseModel):

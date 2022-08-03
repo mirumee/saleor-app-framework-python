@@ -4,12 +4,12 @@ from collections import defaultdict
 from fastapi import Depends, Request
 from fastapi.exceptions import HTTPException
 
-from saleor_app.deps import saleor_domain_header, verify_saleor_domain
 from saleor_app.errors import InstallAppError
 from saleor_app.install import install_app
 from saleor_app.saleor.exceptions import GraphQLError
-from saleor_app.schemas.core import InstallData
+from saleor_app.schemas.core import InstallData, Saleor
 from saleor_app.schemas.utils import LazyUrl
+from saleor_app.security import SaleorDomainSecurity
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +28,7 @@ async def manifest(request: Request):
 async def install(
     request: Request,
     data: InstallData,
-    _domain_is_valid=Depends(verify_saleor_domain),
-    saleor_domain=Depends(saleor_domain_header),
+    saleor: Saleor = Depends(SaleorDomainSecurity()),
 ):
     events = defaultdict(list)
     if hasattr(request.app, "webhook_router"):
@@ -44,7 +43,7 @@ async def install(
     if events:
         try:
             webhook_data = await install_app(
-                saleor_domain=saleor_domain,
+                saleor=saleor,
                 auth_token=data.auth_token,
                 manifest=request.app.manifest,
                 events=events,
@@ -59,7 +58,7 @@ async def install(
         webhook_data = None
 
     await request.app.save_app_data(
-        saleor_domain=saleor_domain,
+        saleor=saleor,
         auth_token=data.auth_token,
         webhook_data=webhook_data,
     )

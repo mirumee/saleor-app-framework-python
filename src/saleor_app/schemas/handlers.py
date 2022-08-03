@@ -3,7 +3,7 @@ from typing import Awaitable, Callable, List, Optional
 
 from pydantic import AnyHttpUrl, BaseModel
 
-from saleor_app.schemas.core import DomainName
+from saleor_app.schemas.core import Saleor
 from saleor_app.schemas.webhook import Webhook
 
 
@@ -117,7 +117,7 @@ class SaleorEventType(str, Enum):
     CHECKOUT_FILTER_SHIPPING_METHODS = "CHECKOUT_FILTER_SHIPPING_METHODS"
 
 
-WebHookHandlerSignature = Optional[Callable[[List[Webhook], DomainName], Awaitable]]
+WebHookHandlerSignature = Optional[Callable[[List[Webhook], Saleor], Awaitable]]
 
 
 class SQSUrl(AnyHttpUrl):
