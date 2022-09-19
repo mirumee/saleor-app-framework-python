@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, create_autospec
 
 import pytest
 
@@ -49,9 +49,13 @@ def get_webhook_details():
     return AsyncMock()
 
 
+async def _webhook_handler():
+    pass
+
+
 @pytest.fixture
 def webhook_handler():
-    return AsyncMock()
+    return create_autospec(_webhook_handler)
 
 
 @pytest.fixture

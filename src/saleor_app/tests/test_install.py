@@ -16,16 +16,13 @@ async def test_install_app(mocker, manifest):
     )
     mocker.patch("saleor_app.install.secrets.choice", return_value="A")
 
-    assert (
-        await install_app(
-            saleor_domain="saleor_domain",
-            auth_token="test_token",
-            manifest=manifest,
-            events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
-            use_insecure_saleor_http=True,
-        )
-        == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
-    )
+    assert await install_app(
+        saleor_domain="saleor_domain",
+        auth_token="test_token",
+        manifest=manifest,
+        events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+        use_insecure_saleor_http=True,
+    ) == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
 
     mock_get_client_for_app.assert_called_once_with(
         "http://saleor_domain", manifest=manifest, auth_token="test_token"
@@ -66,16 +63,13 @@ async def test_install_app_secure_https(mocker, manifest):
         "saleor_app.install.get_client_for_app", return_value=mock_saleor_client
     )
     mocker.patch("saleor_app.install.secrets.choice", return_value="A")
-    assert (
-        await install_app(
-            saleor_domain="saleor_domain",
-            auth_token="test_token",
-            manifest=manifest,
-            events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
-            use_insecure_saleor_http=False,
-        )
-        == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
-    )
+    assert await install_app(
+        saleor_domain="saleor_domain",
+        auth_token="test_token",
+        manifest=manifest,
+        events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+        use_insecure_saleor_http=False,
+    ) == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
 
     mock_get_client_for_app.assert_called_once_with(
         "https://saleor_domain", manifest=manifest, auth_token="test_token"
