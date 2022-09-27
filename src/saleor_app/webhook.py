@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.routing import APIRoute
@@ -41,6 +41,7 @@ class WebhookRouter(APIRouter):
         super().__init__(*args, **kwargs)
         self.http_routes = {}
         self.sqs_routes = {}
+        self.http_routes_subscriptions = {}
         self.post("", name="handle-webhook")(self.__handle_webhook_stub)
 
     async def __handle_webhook_stub(
@@ -58,7 +59,7 @@ class WebhookRouter(APIRouter):
         """
         return {}
 
-    def http_event_route(self, event_type: SaleorEventType):
+    def http_event_route(self, event_type: SaleorEventType, subscription_query: Optional[str] = None):
         def decorator(func: WebHookHandlerSignature):
             self.http_routes[event_type] = APIRoute(
                 "",
@@ -68,6 +69,8 @@ class WebhookRouter(APIRouter):
                     Depends(verify_webhook_signature),
                 ],
             )
+            if subscription_query:
+                self.http_routes_subscriptions[event_type] = subscription_query
 
         return decorator
 

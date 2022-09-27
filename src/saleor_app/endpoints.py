@@ -33,10 +33,8 @@ async def install(
 ):
     events = defaultdict(list)
     if hasattr(request.app, "webhook_router"):
-        if request.app.webhook_router.http_routes:
-            events[request.url_for("handle-webhook")] = list(
-                request.app.webhook_router.http_routes.keys()
-            )
+        for event_type, _ in request.app.webhook_router.http_routes.items():
+            events[request.url_for("handle-webhook")].append(event_type)
         for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
             key = str(sqs_handler.target_url)
             events[key].append(event_type)
@@ -49,6 +47,7 @@ async def install(
                 manifest=request.app.manifest,
                 events=events,
                 use_insecure_saleor_http=request.app.use_insecure_saleor_http,
+                http_routes_subscriptions=request.app.webhook_router.http_routes_subscriptions
             )
         except (InstallAppError, GraphQLError) as exc:
             logger.debug(str(exc), exc_info=1)
