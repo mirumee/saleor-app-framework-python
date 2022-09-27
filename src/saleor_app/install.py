@@ -20,7 +20,6 @@ async def install_app(
     manifest: Manifest,
     events: Dict[str, SaleorEventType],
     use_insecure_saleor_http: bool,
-    http_routes_subscriptions: [Dict[str, str]]
 ):
     alphabet = string.ascii_letters + string.digits
     secret_key = "".join(secrets.choice(alphabet) for _ in range(20))
@@ -32,7 +31,8 @@ async def install_app(
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
     ) as saleor_client:
-        for target_url, event_type in events.items():
+        for target_url, event in events.items():
+            event_type, subscription_query = event
             webhook_input = {
                 "targetUrl": str(target_url),
                 "events": [event_type.upper()],
@@ -40,8 +40,8 @@ async def install_app(
                 "secretKey": secret_key,
             }
 
-            if subscription_query := http_routes_subscriptions.get(event_type, None):
-                webhook_input = webhook_input | {"query": subscription_query}
+            if subscription_query:
+                webhook_input["query"] = subscription_query
 
             try:
                 response = await saleor_client.execute(
