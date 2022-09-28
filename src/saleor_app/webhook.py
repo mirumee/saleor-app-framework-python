@@ -59,7 +59,9 @@ class WebhookRouter(APIRouter):
         """
         return {}
 
-    def http_event_route(self, event_type: SaleorEventType, subscription_query: Optional[str] = None):
+    def http_event_route(
+        self, event_type: SaleorEventType, subscription_query: Optional[str] = None
+    ):
         def decorator(func: WebHookHandlerSignature):
             self.http_routes[event_type] = APIRoute(
                 "",

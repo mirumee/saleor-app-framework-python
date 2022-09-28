@@ -31,10 +31,8 @@ async def install_app(
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
     ) as saleor_client:
-        for target_url, event_tuples in events.items():
-            for event in event_tuples:
-                event_type, subscription_query = event
-                logger.debug(f"Event {event}, event type: {event_type}, target url {target_url}")
+        for target_url, target_events in events.items():
+            for event_type, subscription_query in target_events:
                 webhook_input = {
                     "targetUrl": str(target_url),
                     "events": [event_type.upper()],
@@ -48,9 +46,7 @@ async def install_app(
                 try:
                     response = await saleor_client.execute(
                         CREATE_WEBHOOK,
-                        variables={
-                            "input": webhook_input
-                        },
+                        variables={"input": webhook_input},
                     )
                 except GraphQLError as exc:
                     errors.append(exc)
