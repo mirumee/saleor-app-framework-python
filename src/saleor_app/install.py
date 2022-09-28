@@ -18,7 +18,7 @@ async def install_app(
     saleor_domain: DomainName,
     auth_token: AppToken,
     manifest: Manifest,
-    events: Dict[str, SaleorEventType],
+    events: Dict[str, tuple[SaleorEventType, str]],
     use_insecure_saleor_http: bool,
 ):
     alphabet = string.ascii_letters + string.digits
@@ -31,27 +31,29 @@ async def install_app(
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
     ) as saleor_client:
-        for target_url, event in events.items():
-            event_type, subscription_query = event
-            webhook_input = {
-                "targetUrl": str(target_url),
-                "events": [event_type.upper()],
-                "name": f"{manifest.name}",
-                "secretKey": secret_key,
-            }
+        for target_url, event_tuples in events.items():
+            for event in event_tuples:
+                event_type, subscription_query = event
+                logger.debug(f"Event {event}, event type: {event_type}, target url {target_url}")
+                webhook_input = {
+                    "targetUrl": str(target_url),
+                    "events": [event_type.upper()],
+                    "name": f"{manifest.name}",
+                    "secretKey": secret_key,
+                }
 
-            if subscription_query:
-                webhook_input["query"] = subscription_query
+                if subscription_query:
+                    webhook_input["query"] = subscription_query
 
-            try:
-                response = await saleor_client.execute(
-                    CREATE_WEBHOOK,
-                    variables={
-                        "input": webhook_input
-                    },
-                )
-            except GraphQLError as exc:
-                errors.append(exc)
+                try:
+                    response = await saleor_client.execute(
+                        CREATE_WEBHOOK,
+                        variables={
+                            "input": webhook_input
+                        },
+                    )
+                except GraphQLError as exc:
+                    errors.append(exc)
 
     if errors:
         logger.error("Unable to finish installation of app for %s.", saleor_domain)

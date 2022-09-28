@@ -38,7 +38,7 @@ async def install(
                 (event_type, request.app.webhook_router.http_routes_subscriptions.get(event_type)))
         for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
             key = str(sqs_handler.target_url)
-            events[key].append(event_type)
+            events[key].append((event_type, None))
 
     if events:
         try:
