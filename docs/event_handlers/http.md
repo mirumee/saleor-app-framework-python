@@ -115,6 +115,48 @@ app.include_webhook_router(get_webhook_details=get_webhook_details)
 )(product_created)
 ```
 
+### Support for subscription webhook payloads
+
+Difference between basic approach for webhook handlers is that we filling optional argument for subscription query
+and also more general payload parameter type in endpoint because structure of subscription payload sended by Saelor is
+different in this case.
+
+You can find documentation for Saleor subscription here:
+[Saleor's docs - subscription](https://docs.saleor.io/docs/3.0/developer/extending/apps/subscription-webhook-payloads)
+
+An example of a HTTP subscription webhook handler is:
+
+```python linenums="1" hl_lines="21-26"
+from saleor_app.app import SaleorApp
+from saleor_app.deps import saleor_domain_header # (1)
+from saleor_app.schemas.handlers import SaleorEventType
+from saleor_app.schemas.webhook import Webhook
+from saleor_app.schemas.core import DomainName, WebhookData
+
+
+async def get_webhook_details(saleor_domain: DomainName) -> WebhookData:
+    return WebhookData(
+        webhook_id="webhook-id",
+        webhook_secret_key="webhook-secret-key",
+    )
+
+
+app = SaleorApp(
+    #[...]
+)
+app.include_webhook_router(get_webhook_details=get_webhook_details)
+
+
+SUBSCRIPTION_ORDER_CREATED = "subscription { event { ... on DraftOrderCreated { order { id status created } } } }"
+
+@app.webhook_router.http_event_route(SaleorEventType.ORDER_CREATED, subscription_query=SUBSCRIPTION_ORDER_CREATED)
+async def order_created(
+    payload: Request,
+    saleor_domain=Depends(saleor_domain_header)  # (2)
+):
+    await do_something(payload, saleor_domain)
+```
+
 ### Reinstall the app
 
 Neither Saleor nor the app will automatically update the registered webhooks, you need to reinstall the app in Saleor if it was already installed.
