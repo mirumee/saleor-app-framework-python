@@ -31,21 +31,25 @@ async def install_app(
     async with get_client_for_app(
         f"{schema}://{saleor_domain}", manifest=manifest, auth_token=auth_token
     ) as saleor_client:
-        for target_url, event_types in events.items():
-            try:
-                response = await saleor_client.execute(
-                    CREATE_WEBHOOK,
-                    variables={
-                        "input": {
-                            "targetUrl": str(target_url),
-                            "events": [event.upper() for event in event_types],
-                            "name": f"{manifest.name}",
-                            "secretKey": secret_key,
-                        }
-                    },
-                )
-            except GraphQLError as exc:
-                errors.append(exc)
+        for target_url, event_definition in events.items():
+            for event_type, handler in event_definition.items():
+                variables = {
+                    "input": {
+                        "targetUrl": str(target_url),
+                        "events": [event_type.upper()],
+                        "name": f"{manifest.name}",
+                        "secretKey": secret_key,
+                    }
+                }
+                if handler.subscription_query:
+                    variables["input"]["query"] = handler.subscription_query
+                try:
+                    response = await saleor_client.execute(
+                        CREATE_WEBHOOK,
+                        variables=variables,
+                    )
+                except GraphQLError as exc:
+                    errors.append(exc)
 
     if errors:
         logger.error("Unable to finish installation of app for %s.", saleor_domain)

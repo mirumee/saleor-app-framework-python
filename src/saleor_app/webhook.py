@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Any, Callable, List, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.routing import APIRoute
@@ -18,6 +18,19 @@ from saleor_app.schemas.handlers import (
 from saleor_app.schemas.webhook import Webhook
 
 SALEOR_EVENT_HEADER = "x-saleor-event"
+
+
+class WebhookAPIRoute(APIRoute):
+
+    def __init__(self, 
+        path: str,
+        endpoint: Callable[..., Any],
+        subscription_query: Optional[str] = None,
+        *args, 
+        **kwargs
+    ):
+        super().__init__(path=path, endpoint=endpoint, *args, **kwargs)
+        self.subscription_query = subscription_query
 
 
 class WebhookRoute(APIRoute):
@@ -58,11 +71,12 @@ class WebhookRouter(APIRouter):
         """
         return {}
 
-    def http_event_route(self, event_type: SaleorEventType):
+    def http_event_route(self, event_type: SaleorEventType, subscription_query: Optional[str] = None):
         def decorator(func: WebHookHandlerSignature):
-            self.http_routes[event_type] = APIRoute(
+            self.http_routes[event_type] = WebhookAPIRoute(
                 "",
                 func,
+                subscription_query=subscription_query,
                 dependencies=[
                     Depends(verify_saleor_domain),
                     Depends(verify_webhook_signature),
