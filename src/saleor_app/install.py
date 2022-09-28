@@ -1,7 +1,7 @@
 import logging
 import secrets
 import string
-from typing import Dict, Optional
+from typing import Dict, Tuple
 
 from saleor_app.errors import InstallAppError
 from saleor_app.saleor.exceptions import GraphQLError
@@ -18,7 +18,7 @@ async def install_app(
     saleor_domain: DomainName,
     auth_token: AppToken,
     manifest: Manifest,
-    events: Dict[str, tuple[SaleorEventType, str]],
+    events: Dict[str, Tuple[SaleorEventType, str]],
     use_insecure_saleor_http: bool,
 ):
     alphabet = string.ascii_letters + string.digits

@@ -40,8 +40,8 @@ class WebhookRouter(APIRouter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.http_routes = {}
-        self.sqs_routes = {}
         self.http_routes_subscriptions = {}
+        self.sqs_routes = {}
         self.post("", name="handle-webhook")(self.__handle_webhook_stub)
 
     async def __handle_webhook_stub(
@@ -71,6 +71,7 @@ class WebhookRouter(APIRouter):
                     Depends(verify_webhook_signature),
                 ],
             )
+
             if subscription_query:
                 self.http_routes_subscriptions[event_type] = subscription_query
 
