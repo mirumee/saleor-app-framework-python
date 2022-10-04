@@ -117,12 +117,9 @@ app.include_webhook_router(get_webhook_details=get_webhook_details)
 
 ### Support for subscription webhook payloads
 
-Difference between basic approach for webhook handlers is that we filling optional argument for subscription query
-and also more general payload parameter type in endpoint because structure of subscription payload sended by Saelor is
-different in this case.
+The difference between subscriptions and the basic approach for webhook handlers is that we add an optional argument for the subscription query, and also a more general payload parameter type in the endpoint. This is because the structure of the subscription payload sent by Saelor is different in this case.
 
-You can find documentation for Saleor subscription here:
-[Saleor's docs - subscription](https://docs.saleor.io/docs/3.0/developer/extending/apps/subscription-webhook-payloads)
+You can find documentation for Saleor subscription here: [Saleor's docs - subscription](https://docs.saleor.io/docs/3.0/developer/extending/apps/subscription-webhook-payloads)
 
 An example of a HTTP subscription webhook handler is:
 
