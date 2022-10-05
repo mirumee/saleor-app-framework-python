@@ -20,7 +20,7 @@ async def test_install_app(mocker, manifest):
         saleor_domain="saleor_domain",
         auth_token="test_token",
         manifest=manifest,
-        events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+        events={"queue_1": [("TEST_EVENT_1", None)], "url_1": [("TEST_EVENT_2", None)]},
         use_insecure_saleor_http=True,
     ) == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
 
@@ -67,7 +67,7 @@ async def test_install_app_secure_https(mocker, manifest):
         saleor_domain="saleor_domain",
         auth_token="test_token",
         manifest=manifest,
-        events={"queue_1": ["TEST_EVENT_1"], "url_1": ["TEST_EVENT_2"]},
+        events={"queue_1": [("TEST_EVENT_1", None)], "url_1": [("TEST_EVENT_2", None)]},
         use_insecure_saleor_http=False,
     ) == WebhookData(webhook_id="123", webhook_secret_key="A" * 20)
 

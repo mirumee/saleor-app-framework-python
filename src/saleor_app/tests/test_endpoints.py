@@ -48,15 +48,15 @@ async def test_install(saleor_app_with_webhooks, get_webhook_details, monkeypatc
         manifest=saleor_app_with_webhooks.manifest,
         events={
             "awssqs://username:password@localstack:4566/account_id/order_created": [
-                SaleorEventType.ORDER_CREATED,
+                (SaleorEventType.ORDER_CREATED, None),
             ],
             "awssqs://username:password@localstack:4566/account_id/order_updated": [
-                SaleorEventType.ORDER_UPDATED,
+                (SaleorEventType.ORDER_UPDATED, None),
             ],
             "http://test_app.saleor.local/webhook": [
-                SaleorEventType.PRODUCT_CREATED,
-                SaleorEventType.PRODUCT_UPDATED,
-                SaleorEventType.PRODUCT_DELETED,
+                (SaleorEventType.PRODUCT_CREATED, None),
+                (SaleorEventType.PRODUCT_UPDATED, None),
+                (SaleorEventType.PRODUCT_DELETED, None),
             ],
         },
         use_insecure_saleor_http=False,
