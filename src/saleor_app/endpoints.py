@@ -33,13 +33,18 @@ async def install(
 ):
     events = defaultdict(list)
     if hasattr(request.app, "webhook_router"):
-        if request.app.webhook_router.http_routes:
-            events[request.url_for("handle-webhook")] = list(
-                request.app.webhook_router.http_routes.keys()
+        for event_type in request.app.webhook_router.http_routes:
+            events[request.url_for("handle-webhook")].append(
+                (
+                    event_type,
+                    request.app.webhook_router.http_routes_subscriptions.get(
+                        event_type
+                    ),
+                )
             )
         for event_type, sqs_handler in request.app.webhook_router.sqs_routes.items():
             key = str(sqs_handler.target_url)
-            events[key].append(event_type)
+            events[key].append((event_type, None))
 
     if events:
         try:
