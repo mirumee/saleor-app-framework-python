@@ -45,6 +45,7 @@ class WebhookHandlers(BaseModel):
 
     fulfillment_created: Optional[Callable[[Payload, DomainName], Awaitable]] = None
     fulfillment_canceled: Optional[Callable[[Payload, DomainName], Awaitable]] = None
+    fulfillment_approved: Optional[Callable[[Payload, DomainName], Awaitable]] = None
 
     notify_user: Optional[Callable[[Payload, DomainName], Awaitable]] = None
 
