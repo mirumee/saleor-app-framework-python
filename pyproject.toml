@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "saleor-app"
-version = "0.1.3"
+version = "0.1.4"
 description = "Saleor app framework"
 authors = [ "Saleor Commerce <hello@saleor.io>" ]
 
