@@ -16,6 +16,7 @@ class SaleorClient:
         self.session = aiohttp.ClientSession(
             base_url=saleor_url,
             headers=headers,
+            raise_for_status=True,
             timeout=ClientTimeout(total=timeout),
         )
 
@@ -45,4 +46,4 @@ class SaleorClient:
                 logger.error("Error when executing a GraphQL call to Saleor")
                 logger.debug(str(exc))
                 raise exc
-            return response_data["data"]
+            return response_data.get("data")
