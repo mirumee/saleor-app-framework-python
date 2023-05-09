@@ -1,0 +1,1127 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Small Framework helping you to bootstrap your Saleor 3rd Party App">
+      
+      
+        <meta name="author" content="Saleor.io">
+      
+      
+        <link rel="canonical" href="https://github.com/saleor/saleor-app-framework-python/">
+      
+      <link rel="icon" href="assets/saleor.svg">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.5.2">
+    
+    
+      
+        <title>Saleor App Framework</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.9f9400aa.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="light-blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#welcome-to-saleor-app-framework" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+  Saleor App Framework is still in development, expect things to change.
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Saleor App Framework" class="md-header__button md-logo" aria-label="Saleor App Framework" data-md-component="logo">
+      
+  <img src="assets/saleor.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Saleor App Framework
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Welcome to Saleor App Framework
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="light-blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/saleor/saleor-app-framework-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    saleor/saleor-app-framework-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Saleor App Framework" class="md-nav__button md-logo" aria-label="Saleor App Framework" data-md-component="logo">
+      
+  <img src="assets/saleor.svg" alt="logo">
+
+    </a>
+    Saleor App Framework
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/saleor/saleor-app-framework-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    saleor/saleor-app-framework-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Welcome to Saleor App Framework
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        Welcome to Saleor App Framework
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
+    <nav class="md-nav" aria-label="Quickstart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-the-framework" class="md-nav__link">
+    Install the framework
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-saleor-app" class="md-nav__link">
+    Create the Saleor app
+  </a>
+  
+    <nav class="md-nav" aria-label="Create the Saleor app">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manifest" class="md-nav__link">
+    Manifest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-domain" class="md-nav__link">
+    Validate Domain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-application-data" class="md-nav__link">
+    Saving Application Data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-url" class="md-nav__link">
+    Configuration URL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-app" class="md-nav__link">
+    Running the App
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Event handlers
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Event handlers" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Event handlers
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="event_handlers/http/" class="md-nav__link">
+        HTTP Webhook Event Handling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="event_handlers/sqs/" class="md-nav__link">
+        AWS SQS Handlers
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Local app development
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Local app development" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Local app development
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="local_app_development/" class="md-nav__link">
+        Running everything locally
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
+    <nav class="md-nav" aria-label="Quickstart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-the-framework" class="md-nav__link">
+    Install the framework
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-saleor-app" class="md-nav__link">
+    Create the Saleor app
+  </a>
+  
+    <nav class="md-nav" aria-label="Create the Saleor app">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manifest" class="md-nav__link">
+    Manifest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-domain" class="md-nav__link">
+    Validate Domain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-application-data" class="md-nav__link">
+    Saving Application Data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-url" class="md-nav__link">
+    Configuration URL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-app" class="md-nav__link">
+    Running the App
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="welcome-to-saleor-app-framework">Welcome to Saleor App Framework<a class="headerlink" href="#welcome-to-saleor-app-framework" title="Permanent link">&para;</a></h1>
+<p>You are reading the Saleor App Framework (Python) documentation. This document should help you to quickly bootstrap a 3<sup>rd</sup> Party Saleor App, read more about those <a href="https://docs.saleor.io/docs/3.0/developer/extending/apps/key-concepts" target="_blank"><span class="twemoji"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 16.933333 16.933334"
+   height="64"
+   width="64">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-280.06665)"
+     id="layer1">
+    <path
+       id="path21"
+       d="M 0.60098255,296.34253 C 0.09848919,295.78728 0.0181173,294.70214 0.0181173,288.4729 c 0,-6.55274 0.05997942,-7.27984 0.64405864,-7.80844 0.55525026,-0.50249 1.64039316,-0.58286 7.86962726,-0.58286 6.5527378,0 7.2798428,0.06 7.8084338,0.64405 0.502493,0.55526 0.582865,1.6404 0.582865,7.86963 0,6.55275 -0.05998,7.27985 -0.644059,7.80844 -0.55525,0.50249 -1.640393,0.58287 -7.8696265,0.58287 -6.5527383,0 -7.279843,-0.06 -7.80843395,-0.64406 z M 10.687769,293.72885 c 0.324967,-0.24213 0.684841,-0.91933 0.79972,-1.50488 0.259927,-1.32491 -0.513564,-2.11091 -2.7003779,-2.74405 -0.8520365,-0.24669 -1.514463,-0.60003 -1.4720581,-0.78522 0.1077792,-0.47069 1.8599317,-0.64402 1.8599317,-0.18399 0,0.61363 1.7616013,0.43144 2.0068113,-0.20756 0.365924,-0.95359 -1.131912,-1.88218 -3.0359815,-1.88218 -4.0428724,0 -4.3841069,4.07796 -0.3975933,4.75148 1.096303,0.18523 1.4372046,0.39311 1.3539083,0.82563 -0.1538047,0.79864 -1.3739972,0.96389 -1.8915001,0.25617 -0.3000222,-0.41031 -0.6976235,-0.51453 -1.3439809,-0.35231 -1.0619738,0.26654 -1.1549752,0.71708 -0.3350448,1.62309 0.6967529,0.7699 4.2100214,0.90878 5.1561653,0.20382 z m 2.889554,-10.47757 1.012251,-1.05656 H 9.4828604 4.3761453 l -1.0122492,1.05656 -1.0122506,1.05657 h 5.1067138 5.1067147 z"
+       style="fill:#000000;stroke-width:0.35218719" />
+  </g>
+</svg>
+</span> Saleor's documentation</a>.</p>
+<p>The only supported web framework is <strong>FastAPI</strong>.</p>
+<h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
+<h3 id="install-the-framework">Install the framework<a class="headerlink" href="#install-the-framework" title="Permanent link">&para;</a></h3>
+<p>Using Poetry (recommended, <a href="https://python-poetry.org/docs/#installation" target="_blank"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.11 0-2 .89-2 2v16c0 1.11.89 2 2 2h12c1.11 0 2-.89 2-2V8l-6-6m-3 18h-1c-1.61 0-4-1.06-4-4 0-2.93 2.39-4 4-4h1v2h-1c-.46 0-2 .17-2 2 0 1.9 1.67 2 2 2h1v2m4-5v2H9v-2h6m-1 5h-1v-2h1c.46 0 2-.17 2-2 0-1.9-1.67-2-2-2h-1v-2h1c1.61 0 4 1.07 4 4 0 2.94-2.39 4-4 4M13 9V3.5L18.5 9H13Z"/></svg></span> installing poetry</a>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>poetry add git+https://github.com/mirumee/saleor-app-framework-python.git@main
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># (1)</span>
+</code></pre></div>
+<ol>
+<li>Not on PyPi yet, you must install from git</li>
+</ol>
+<p>Using Pip:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip install git+https://github.com/mirumee/saleor-app-framework-python.git@main 
+</code></pre></div>
+<h3 id="create-the-saleor-app">Create the Saleor app<a class="headerlink" href="#create-the-saleor-app" title="Permanent link">&para;</a></h3>
+<p>To run your Saleor App you can use the <code class="highlight"><span class="n">SaleorApp</span></code> class which overloads the usual <code class="highlight"><span class="n">FastAPI</span></code> class.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span>
+<span class="normal"><a href="#__codelineno-2-2">2</a></span>
+<span class="normal"><a href="#__codelineno-2-3">3</a></span>
+<span class="normal"><a href="#__codelineno-2-4">4</a></span>
+<span class="normal"><a href="#__codelineno-2-5">5</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">saleor_app.app</span> <span class="kn">import</span> <span class="n">SaleorApp</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="n">app</span> <span class="o">=</span> <span class="n">SaleorApp</span><span class="p">(</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4"></a>    <span class="c1"># more arguments to come</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>You can use the <code class="highlight"><span class="n">app</span></code> instance as you would normally use the standard one, i.e. to initialize Sentry or add Middleware. None of the core FastAPI logic is changed by the framework.</p>
+<h4 id="manifest">Manifest<a class="headerlink" href="#manifest" title="Permanent link">&para;</a></h4>
+<p>As described in <a href="https://docs.saleor.io/docs/3.0/developer/extending/apps/manifest" target="_blank"><span class="twemoji"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 16.933333 16.933334"
+   height="64"
+   width="64">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-280.06665)"
+     id="layer1">
+    <path
+       id="path21"
+       d="M 0.60098255,296.34253 C 0.09848919,295.78728 0.0181173,294.70214 0.0181173,288.4729 c 0,-6.55274 0.05997942,-7.27984 0.64405864,-7.80844 0.55525026,-0.50249 1.64039316,-0.58286 7.86962726,-0.58286 6.5527378,0 7.2798428,0.06 7.8084338,0.64405 0.502493,0.55526 0.582865,1.6404 0.582865,7.86963 0,6.55275 -0.05998,7.27985 -0.644059,7.80844 -0.55525,0.50249 -1.640393,0.58287 -7.8696265,0.58287 -6.5527383,0 -7.279843,-0.06 -7.80843395,-0.64406 z M 10.687769,293.72885 c 0.324967,-0.24213 0.684841,-0.91933 0.79972,-1.50488 0.259927,-1.32491 -0.513564,-2.11091 -2.7003779,-2.74405 -0.8520365,-0.24669 -1.514463,-0.60003 -1.4720581,-0.78522 0.1077792,-0.47069 1.8599317,-0.64402 1.8599317,-0.18399 0,0.61363 1.7616013,0.43144 2.0068113,-0.20756 0.365924,-0.95359 -1.131912,-1.88218 -3.0359815,-1.88218 -4.0428724,0 -4.3841069,4.07796 -0.3975933,4.75148 1.096303,0.18523 1.4372046,0.39311 1.3539083,0.82563 -0.1538047,0.79864 -1.3739972,0.96389 -1.8915001,0.25617 -0.3000222,-0.41031 -0.6976235,-0.51453 -1.3439809,-0.35231 -1.0619738,0.26654 -1.1549752,0.71708 -0.3350448,1.62309 0.6967529,0.7699 4.2100214,0.90878 5.1561653,0.20382 z m 2.889554,-10.47757 1.012251,-1.05656 H 9.4828604 4.3761453 l -1.0122492,1.05656 -1.0122506,1.05657 h 5.1067138 5.1067147 z"
+       style="fill:#000000;stroke-width:0.35218719" />
+  </g>
+</svg>
+</span> App manifest</a> an app needs a manifest, the framework provides a Pydantic representation of that which needs to be provided when initializing the app.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-3-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-3-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-3-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-3-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-3-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-3-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-3-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-3-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-3-10">10</a></span>
+<span class="normal"><a href="#__codelineno-3-11">11</a></span>
+<span class="normal"><a href="#__codelineno-3-12">12</a></span>
+<span class="normal"><a href="#__codelineno-3-13">13</a></span>
+<span class="normal"><a href="#__codelineno-3-14">14</a></span>
+<span class="normal"><a href="#__codelineno-3-15">15</a></span>
+<span class="normal"><a href="#__codelineno-3-16">16</a></span>
+<span class="normal"><a href="#__codelineno-3-17">17</a></span>
+<span class="normal"><a href="#__codelineno-3-18">18</a></span>
+<span class="normal"><a href="#__codelineno-3-19">19</a></span>
+<span class="normal"><a href="#__codelineno-3-20">20</a></span>
+<span class="normal"><a href="#__codelineno-3-21">21</a></span>
+<span class="normal"><a href="#__codelineno-3-22">22</a></span>
+<span class="normal"><a href="#__codelineno-3-23">23</a></span>
+<span class="normal"><a href="#__codelineno-3-24">24</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">saleor_app.app</span> <span class="kn">import</span> <span class="n">SaleorApp</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="hll"><span class="kn">from</span> <span class="nn">saleor_app.schemas.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+</span><a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="hll"><span class="kn">from</span> <span class="nn">saleor_app.schemas.utils</span> <span class="kn">import</span> <span class="n">LazyUrl</span>
+</span><a id="__codelineno-3-4" name="__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="hll"><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+</span><a id="__codelineno-3-7" name="__codelineno-3-7"></a><span class="hll">    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="hll">    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="hll">    <span class="n">about</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App seving as an example.&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="hll">    <span class="n">data_privacy</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="hll">    <span class="n">data_privacy_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/dataPrivacyUrl&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-12" name="__codelineno-3-12"></a><span class="hll">    <span class="n">homepage_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/homepageUrl&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="hll">    <span class="n">support_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/supportUrl&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="hll">    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;saleor-simple-sample&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="hll">    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MANAGE_PRODUCTS&quot;</span><span class="p">,</span> <span class="s2">&quot;MANAGE_USERS&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="hll">    <span class="n">configuration_url</span><span class="o">=</span><span class="n">LazyUrl</span><span class="p">(</span><span class="s2">&quot;configuration-form&quot;</span><span class="p">),</span>
+</span><a id="__codelineno-3-17" name="__codelineno-3-17"></a><span class="hll">    <span class="n">extensions</span><span class="o">=</span><span class="p">[],</span>
+</span><a id="__codelineno-3-18" name="__codelineno-3-18"></a><span class="hll"><span class="p">)</span>
+</span><a id="__codelineno-3-19" name="__codelineno-3-19"></a>
+<a id="__codelineno-3-20" name="__codelineno-3-20"></a>
+<a id="__codelineno-3-21" name="__codelineno-3-21"></a><span class="n">app</span> <span class="o">=</span> <span class="n">SaleorApp</span><span class="p">(</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22"></a><span class="hll">    <span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span>
+</span><a id="__codelineno-3-23" name="__codelineno-3-23"></a>    <span class="c1"># more arguments to come</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24"></a><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<details class="info">
+<summary>LazyUrl</summary>
+<p><code class="highlight"><span class="n">saleor_app</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">LazyUrl</span></code> is a lazy loader for app url paths, when a manifest is requested the app will resolve the path name to a full url of that endpoint.</p>
+</details>
+<h4 id="validate-domain">Validate Domain<a class="headerlink" href="#validate-domain" title="Permanent link">&para;</a></h4>
+<p>3<sup>rd</sup> Patry Apps work in a multi-tenant fashion - one app service can serve multiple Saleor instances. To prevent any Saleor instance from using your app the app need to authorize a Saleor instance that's done by a simple function that can be as simple as comparing the incoming Saleor domain or as complex to check the allowed domains in a database.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-4-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-4-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-4-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-4-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-4-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-4-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-4-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-4-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-4-10">10</a></span>
+<span class="normal"><a href="#__codelineno-4-11">11</a></span>
+<span class="normal"><a href="#__codelineno-4-12">12</a></span>
+<span class="normal"><a href="#__codelineno-4-13">13</a></span>
+<span class="normal"><a href="#__codelineno-4-14">14</a></span>
+<span class="normal"><a href="#__codelineno-4-15">15</a></span>
+<span class="normal"><a href="#__codelineno-4-16">16</a></span>
+<span class="normal"><a href="#__codelineno-4-17">17</a></span>
+<span class="normal"><a href="#__codelineno-4-18">18</a></span>
+<span class="normal"><a href="#__codelineno-4-19">19</a></span>
+<span class="normal"><a href="#__codelineno-4-20">20</a></span>
+<span class="normal"><a href="#__codelineno-4-21">21</a></span>
+<span class="normal"><a href="#__codelineno-4-22">22</a></span>
+<span class="normal"><a href="#__codelineno-4-23">23</a></span>
+<span class="normal"><a href="#__codelineno-4-24">24</a></span>
+<span class="normal"><a href="#__codelineno-4-25">25</a></span>
+<span class="normal"><a href="#__codelineno-4-26">26</a></span>
+<span class="normal"><a href="#__codelineno-4-27">27</a></span>
+<span class="normal"><a href="#__codelineno-4-28">28</a></span>
+<span class="normal"><a href="#__codelineno-4-29">29</a></span>
+<span class="normal"><a href="#__codelineno-4-30">30</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">saleor_app.app</span> <span class="kn">import</span> <span class="n">SaleorApp</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="hll"><span class="kn">from</span> <span class="nn">saleor_app.schemas.core</span> <span class="kn">import</span> <span class="n">DomainName</span>
+</span><a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.utils</span> <span class="kn">import</span> <span class="n">LazyUrl</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7"></a><span class="hll"><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_domain</span><span class="p">(</span><span class="n">saleor_domain</span><span class="p">:</span> <span class="n">DomainName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><a id="__codelineno-4-8" name="__codelineno-4-8"></a><span class="hll">    <span class="k">return</span> <span class="n">saleor_domain</span> <span class="o">==</span> <span class="s2">&quot;172.17.0.1:8000&quot;</span>
+</span><a id="__codelineno-4-9" name="__codelineno-4-9"></a>
+<a id="__codelineno-4-10" name="__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13"></a>    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14"></a>    <span class="n">about</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App seving as an example.&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15"></a>    <span class="n">data_privacy</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16"></a>    <span class="n">data_privacy_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/dataPrivacyUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17"></a>    <span class="n">homepage_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/homepageUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18"></a>    <span class="n">support_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/supportUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;saleor-simple-sample&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20"></a>    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MANAGE_PRODUCTS&quot;</span><span class="p">,</span> <span class="s2">&quot;MANAGE_USERS&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21"></a>    <span class="n">configuration_url</span><span class="o">=</span><span class="n">LazyUrl</span><span class="p">(</span><span class="s2">&quot;configuration-form&quot;</span><span class="p">),</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22"></a>    <span class="n">extensions</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23"></a><span class="p">)</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24"></a>
+<a id="__codelineno-4-25" name="__codelineno-4-25"></a>
+<a id="__codelineno-4-26" name="__codelineno-4-26"></a><span class="n">app</span> <span class="o">=</span> <span class="n">SaleorApp</span><span class="p">(</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27"></a>    <span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28"></a><span class="hll">    <span class="n">validate_domain</span><span class="o">=</span><span class="n">validate_domain</span><span class="p">,</span>
+</span><a id="__codelineno-4-29" name="__codelineno-4-29"></a>    <span class="c1"># more arguments to come</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30"></a><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<h4 id="saving-application-data">Saving Application Data<a class="headerlink" href="#saving-application-data" title="Permanent link">&para;</a></h4>
+<p>When Saleor is authorized to install the app an authentication key is issued, that key needs to be securely stored by the app as it provides as much access as the app requested in the manifest.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span>
+<span class="normal"><a href="#__codelineno-5-13">13</a></span>
+<span class="normal"><a href="#__codelineno-5-14">14</a></span>
+<span class="normal"><a href="#__codelineno-5-15">15</a></span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span>
+<span class="normal"><a href="#__codelineno-5-17">17</a></span>
+<span class="normal"><a href="#__codelineno-5-18">18</a></span>
+<span class="normal"><a href="#__codelineno-5-19">19</a></span>
+<span class="normal"><a href="#__codelineno-5-20">20</a></span>
+<span class="normal"><a href="#__codelineno-5-21">21</a></span>
+<span class="normal"><a href="#__codelineno-5-22">22</a></span>
+<span class="normal"><a href="#__codelineno-5-23">23</a></span>
+<span class="normal"><a href="#__codelineno-5-24">24</a></span>
+<span class="normal"><a href="#__codelineno-5-25">25</a></span>
+<span class="normal"><a href="#__codelineno-5-26">26</a></span>
+<span class="normal"><a href="#__codelineno-5-27">27</a></span>
+<span class="normal"><a href="#__codelineno-5-28">28</a></span>
+<span class="normal"><a href="#__codelineno-5-29">29</a></span>
+<span class="normal"><a href="#__codelineno-5-30">30</a></span>
+<span class="normal"><a href="#__codelineno-5-31">31</a></span>
+<span class="normal"><a href="#__codelineno-5-32">32</a></span>
+<span class="normal"><a href="#__codelineno-5-33">33</a></span>
+<span class="normal"><a href="#__codelineno-5-34">34</a></span>
+<span class="normal"><a href="#__codelineno-5-35">35</a></span>
+<span class="normal"><a href="#__codelineno-5-36">36</a></span>
+<span class="normal"><a href="#__codelineno-5-37">37</a></span>
+<span class="normal"><a href="#__codelineno-5-38">38</a></span>
+<span class="normal"><a href="#__codelineno-5-39">39</a></span>
+<span class="normal"><a href="#__codelineno-5-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="kn">from</span> <span class="nn">saleor_app.app</span> <span class="kn">import</span> <span class="n">SaleorApp</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="hll"><span class="kn">from</span> <span class="nn">saleor_app.schemas.core</span> <span class="kn">import</span> <span class="n">DomainName</span><span class="p">,</span> <span class="n">WebhookData</span>
+</span><a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.utils</span> <span class="kn">import</span> <span class="n">LazyUrl</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_domain</span><span class="p">(</span><span class="n">saleor_domain</span><span class="p">:</span> <span class="n">DomainName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a>    <span class="k">return</span> <span class="n">saleor_domain</span> <span class="o">==</span> <span class="s2">&quot;172.17.0.1:8000&quot;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="hll"><span class="k">async</span> <span class="k">def</span> <span class="nf">store_app_data</span><span class="p">(</span>
+</span><a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="hll">    <span class="n">saleor_domain</span><span class="p">:</span> <span class="n">DomainName</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">webhook_data</span><span class="p">:</span> <span class="n">WebhookData</span>
+</span><a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="hll"><span class="p">):</span>
+</span><a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Called store_app_data&quot;</span><span class="p">)</span>
+</span><a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">saleor_domain</span><span class="p">)</span>
+</span><a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">auth_token</span><span class="p">)</span>
+</span><a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="hll">    <span class="nb">print</span><span class="p">(</span><span class="n">webhook_data</span><span class="p">)</span> <span class="c1">#</span>
+</span><a id="__codelineno-5-18" name="__codelineno-5-18"></a>
+<a id="__codelineno-5-19" name="__codelineno-5-19"></a>
+<a id="__codelineno-5-20" name="__codelineno-5-20"></a>
+<a id="__codelineno-5-21" name="__codelineno-5-21"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23"></a>    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24"></a>    <span class="n">about</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App serving as an example.&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25"></a>    <span class="n">data_privacy</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26"></a>    <span class="n">data_privacy_url</span><span class="o">=</span><span class="s2">&quot;http://sample-saleor-app.example.com/dataPrivacyUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27"></a>    <span class="n">homepage_url</span><span class="o">=</span><span class="s2">&quot;http://sample-saleor-app.example.com/homepageUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28"></a>    <span class="n">support_url</span><span class="o">=</span><span class="s2">&quot;http://sample-saleor-app.example.com/supportUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;saleor-simple-sample&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30"></a>    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MANAGE_PRODUCTS&quot;</span><span class="p">,</span> <span class="s2">&quot;MANAGE_USERS&quot;</span><span class="p">],</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31"></a>    <span class="n">configuration_url</span><span class="o">=</span><span class="n">LazyUrl</span><span class="p">(</span><span class="s2">&quot;configuration-form&quot;</span><span class="p">),</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32"></a>    <span class="n">extensions</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33"></a><span class="p">)</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34"></a>
+<a id="__codelineno-5-35" name="__codelineno-5-35"></a>
+<a id="__codelineno-5-36" name="__codelineno-5-36"></a><span class="n">app</span> <span class="o">=</span> <span class="n">SaleorApp</span><span class="p">(</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37"></a>    <span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38"></a>    <span class="n">validate_domain</span><span class="o">=</span><span class="n">validate_domain</span><span class="p">,</span>
+<a id="__codelineno-5-39" name="__codelineno-5-39"></a><span class="hll">    <span class="n">save_app_data</span><span class="o">=</span><span class="n">store_app_data</span><span class="p">,</span> <span class="c1"># (1)</span>
+</span><a id="__codelineno-5-40" name="__codelineno-5-40"></a><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<ol>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4M4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4s-8-1.79-8-4m0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4Z"/></svg></span> Typically, you'd store all the data passed to this function to a DB table</li>
+</ol>
+<h4 id="configuration-url">Configuration URL<a class="headerlink" href="#configuration-url" title="Permanent link">&para;</a></h4>
+<p>To finalize, you need to provide the endpoint named <code class="highlight"><span class="n">configuration</span><span class="o">-</span><span class="n">form</span></code> specified in the <a href="#manifest">#Manifest</a>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-6-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-6-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-6-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-6-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-6-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-6-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-6-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-6-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-6-10">10</a></span>
+<span class="normal"><a href="#__codelineno-6-11">11</a></span>
+<span class="normal"><a href="#__codelineno-6-12">12</a></span>
+<span class="normal"><a href="#__codelineno-6-13">13</a></span>
+<span class="normal"><a href="#__codelineno-6-14">14</a></span>
+<span class="normal"><a href="#__codelineno-6-15">15</a></span>
+<span class="normal"><a href="#__codelineno-6-16">16</a></span>
+<span class="normal"><a href="#__codelineno-6-17">17</a></span>
+<span class="normal"><a href="#__codelineno-6-18">18</a></span>
+<span class="normal"><a href="#__codelineno-6-19">19</a></span>
+<span class="normal"><a href="#__codelineno-6-20">20</a></span>
+<span class="normal"><a href="#__codelineno-6-21">21</a></span>
+<span class="normal"><a href="#__codelineno-6-22">22</a></span>
+<span class="normal"><a href="#__codelineno-6-23">23</a></span>
+<span class="normal"><a href="#__codelineno-6-24">24</a></span>
+<span class="normal"><a href="#__codelineno-6-25">25</a></span>
+<span class="normal"><a href="#__codelineno-6-26">26</a></span>
+<span class="normal"><a href="#__codelineno-6-27">27</a></span>
+<span class="normal"><a href="#__codelineno-6-28">28</a></span>
+<span class="normal"><a href="#__codelineno-6-29">29</a></span>
+<span class="normal"><a href="#__codelineno-6-30">30</a></span>
+<span class="normal"><a href="#__codelineno-6-31">31</a></span>
+<span class="normal"><a href="#__codelineno-6-32">32</a></span>
+<span class="normal"><a href="#__codelineno-6-33">33</a></span>
+<span class="normal"><a href="#__codelineno-6-34">34</a></span>
+<span class="normal"><a href="#__codelineno-6-35">35</a></span>
+<span class="normal"><a href="#__codelineno-6-36">36</a></span>
+<span class="normal"><a href="#__codelineno-6-37">37</a></span>
+<span class="normal"><a href="#__codelineno-6-38">38</a></span>
+<span class="normal"><a href="#__codelineno-6-39">39</a></span>
+<span class="normal"><a href="#__codelineno-6-40">40</a></span>
+<span class="normal"><a href="#__codelineno-6-41">41</a></span>
+<span class="normal"><a href="#__codelineno-6-42">42</a></span>
+<span class="normal"><a href="#__codelineno-6-43">43</a></span>
+<span class="normal"><a href="#__codelineno-6-44">44</a></span>
+<span class="normal"><a href="#__codelineno-6-45">45</a></span>
+<span class="normal"><a href="#__codelineno-6-46">46</a></span>
+<span class="normal"><a href="#__codelineno-6-47">47</a></span>
+<span class="normal"><a href="#__codelineno-6-48">48</a></span>
+<span class="normal"><a href="#__codelineno-6-49">49</a></span>
+<span class="normal"><a href="#__codelineno-6-50">50</a></span>
+<span class="normal"><a href="#__codelineno-6-51">51</a></span>
+<span class="normal"><a href="#__codelineno-6-52">52</a></span>
+<span class="normal"><a href="#__codelineno-6-53">53</a></span>
+<span class="normal"><a href="#__codelineno-6-54">54</a></span>
+<span class="normal"><a href="#__codelineno-6-55">55</a></span>
+<span class="normal"><a href="#__codelineno-6-56">56</a></span>
+<span class="normal"><a href="#__codelineno-6-57">57</a></span>
+<span class="normal"><a href="#__codelineno-6-58">58</a></span>
+<span class="normal"><a href="#__codelineno-6-59">59</a></span>
+<span class="normal"><a href="#__codelineno-6-60">60</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="hll"><span class="kn">import</span> <span class="nn">json</span>
+</span><a id="__codelineno-6-2" name="__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="hll"><span class="kn">from</span> <span class="nn">fastapi.param_functions</span> <span class="kn">import</span> <span class="n">Depends</span>
+</span><a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="hll"><span class="kn">from</span> <span class="nn">fastapi.responses</span> <span class="kn">import</span> <span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">PlainTextResponse</span>
+</span><a id="__codelineno-6-5" name="__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="kn">from</span> <span class="nn">saleor_app.app</span> <span class="kn">import</span> <span class="n">SaleorApp</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="kn">from</span> <span class="nn">saleor_app.deps</span> <span class="kn">import</span> <span class="n">ConfigurationFormDeps</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="hll"><span class="kn">from</span> <span class="nn">saleor_app.schemas.core</span> <span class="kn">import</span> <span class="n">DomainName</span><span class="p">,</span> <span class="n">WebhookData</span>
+</span><a id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="kn">from</span> <span class="nn">saleor_app.schemas.utils</span> <span class="kn">import</span> <span class="n">LazyUrl</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11"></a>
+<a id="__codelineno-6-12" name="__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_domain</span><span class="p">(</span><span class="n">saleor_domain</span><span class="p">:</span> <span class="n">DomainName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14"></a>    <span class="k">return</span> <span class="n">saleor_domain</span> <span class="o">==</span> <span class="s2">&quot;172.17.0.1:8000&quot;</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15"></a>
+<a id="__codelineno-6-16" name="__codelineno-6-16"></a>
+<a id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">store_app_data</span><span class="p">(</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18"></a>    <span class="n">saleor_domain</span><span class="p">:</span> <span class="n">DomainName</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">webhook_data</span><span class="p">:</span> <span class="n">WebhookData</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19"></a><span class="p">):</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Called store_app_data&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">saleor_domain</span><span class="p">)</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">auth_token</span><span class="p">)</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">webhook_data</span><span class="p">)</span> 
+<a id="__codelineno-6-24" name="__codelineno-6-24"></a>
+<a id="__codelineno-6-25" name="__codelineno-6-25"></a>
+<a id="__codelineno-6-26" name="__codelineno-6-26"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+<a id="__codelineno-6-27" name="__codelineno-6-27"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28"></a>    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29"></a>    <span class="n">about</span><span class="o">=</span><span class="s2">&quot;Sample Saleor App seving as an example.&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-30" name="__codelineno-6-30"></a>    <span class="n">data_privacy</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-31" name="__codelineno-6-31"></a>    <span class="n">data_privacy_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/dataPrivacyUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-32" name="__codelineno-6-32"></a>    <span class="n">homepage_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/homepageUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-33" name="__codelineno-6-33"></a>    <span class="n">support_url</span><span class="o">=</span><span class="s2">&quot;http://samle-saleor-app.example.com/supportUrl&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-34" name="__codelineno-6-34"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;saleor-simple-sample&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-35" name="__codelineno-6-35"></a>    <span class="n">permissions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MANAGE_PRODUCTS&quot;</span><span class="p">,</span> <span class="s2">&quot;MANAGE_USERS&quot;</span><span class="p">],</span>
+<a id="__codelineno-6-36" name="__codelineno-6-36"></a>    <span class="n">configuration_url</span><span class="o">=</span><span class="n">LazyUrl</span><span class="p">(</span><span class="s2">&quot;configuration-form&quot;</span><span class="p">),</span>
+<a id="__codelineno-6-37" name="__codelineno-6-37"></a>    <span class="n">extensions</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-6-38" name="__codelineno-6-38"></a><span class="p">)</span>
+<a id="__codelineno-6-39" name="__codelineno-6-39"></a>
+<a id="__codelineno-6-40" name="__codelineno-6-40"></a>
+<a id="__codelineno-6-41" name="__codelineno-6-41"></a><span class="n">app</span> <span class="o">=</span> <span class="n">SaleorApp</span><span class="p">(</span>
+<a id="__codelineno-6-42" name="__codelineno-6-42"></a>    <span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="p">,</span>
+<a id="__codelineno-6-43" name="__codelineno-6-43"></a>    <span class="n">validate_domain</span><span class="o">=</span><span class="n">validate_domain</span><span class="p">,</span>
+<a id="__codelineno-6-44" name="__codelineno-6-44"></a>    <span class="n">save_app_data</span><span class="o">=</span><span class="n">store_app_data</span><span class="p">,</span>
+<a id="__codelineno-6-45" name="__codelineno-6-45"></a><span class="p">)</span>
+<a id="__codelineno-6-46" name="__codelineno-6-46"></a>
+<a id="__codelineno-6-47" name="__codelineno-6-47"></a>
+<a id="__codelineno-6-48" name="__codelineno-6-48"></a><span class="hll"><span class="nd">@app</span><span class="o">.</span><span class="n">configuration_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><a id="__codelineno-6-49" name="__codelineno-6-49"></a><span class="hll">    <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;configuration-form&quot;</span>
+</span><a id="__codelineno-6-50" name="__codelineno-6-50"></a><span class="hll"><span class="p">)</span>
+</span><a id="__codelineno-6-51" name="__codelineno-6-51"></a><span class="hll"><span class="k">async</span> <span class="k">def</span> <span class="nf">get_public_form</span><span class="p">(</span><span class="n">commons</span><span class="p">:</span> <span class="n">ConfigurationFormDeps</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">()):</span>
+</span><a id="__codelineno-6-52" name="__codelineno-6-52"></a><span class="hll">    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+</span><a id="__codelineno-6-53" name="__codelineno-6-53"></a><span class="hll">        <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">commons</span><span class="o">.</span><span class="n">request</span><span class="p">),</span>
+</span><a id="__codelineno-6-54" name="__codelineno-6-54"></a><span class="hll">        <span class="s2">&quot;form_url&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">commons</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+</span><a id="__codelineno-6-55" name="__codelineno-6-55"></a><span class="hll">        <span class="s2">&quot;saleor_domain&quot;</span><span class="p">:</span> <span class="n">commons</span><span class="o">.</span><span class="n">saleor_domain</span><span class="p">,</span>
+</span><a id="__codelineno-6-56" name="__codelineno-6-56"></a><span class="hll">    <span class="p">}</span>
+</span><a id="__codelineno-6-57" name="__codelineno-6-57"></a><span class="hll">    <span class="k">return</span> <span class="n">PlainTextResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># (1)</span>
+</span><a id="__codelineno-6-58" name="__codelineno-6-58"></a><span class="hll">
+</span><a id="__codelineno-6-59" name="__codelineno-6-59"></a><span class="hll">
+</span><a id="__codelineno-6-60" name="__codelineno-6-60"></a><span class="hll"><span class="n">app</span><span class="o">.</span><span class="n">include_saleor_app_routes</span><span class="p">()</span> <span class="c1"># (2)</span>
+</span></code></pre></div></td></tr></table></div>
+<ol>
+<li>This view would normally return a UI that will be rendered in the Dashboard</li>
+<li>Once you are done defining all the configuration routes you need to tell the app to load them</li>
+</ol>
+<blockquote>
+<p>This is a complete example that will work as is.</p>
+</blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Remember about <code>app.include_saleor_app_routes()</code></p>
+</div>
+<h3 id="running-the-app">Running the App<a class="headerlink" href="#running-the-app" title="Permanent link">&para;</a></h3>
+<p>To run the app you can save the above example in <code>simple_app/app.py</code> and run it with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>uvicorn simple_app.app:app --host <span class="m">0</span>.0.0.0 --port <span class="m">5000</span> --reload
+</code></pre></div>
+<p>Or create a <code>simple_app/__main__.py</code> with:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-8-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-8-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-8-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-8-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-8-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-8-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-8-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-8-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-8-10">10</a></span>
+<span class="normal"><a href="#__codelineno-8-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="kn">import</span> <span class="nn">uvicorn</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5"></a>    <span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6"></a>        <span class="s2">&quot;simple_app.app:app&quot;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7"></a>    <span class="p">)</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11"></a>    <span class="n">main</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+<p>and run the module as a script with Python's <code>-m</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python -m simple_app
+</code></pre></div>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p>Visit the <a href="https://github.com/saleor/saleor-app-framework-python/tree/main/samples" target="_blank"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/></svg></span> Samples directory</a> to check apps that were built as examples of how the framework can be used.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+      
+        
+        <a href="event_handlers/http/" class="md-footer__link md-footer__link--next" aria-label="Next: HTTP Webhook Event Handling" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              HTTP Webhook Event Handling
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.annotate"], "search": "assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.39f04ddb.min.js"></script>
+      
+    
+  </body>
+</html>

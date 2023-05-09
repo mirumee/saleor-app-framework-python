@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://github.com/saleor/saleor-app-framework-python/</loc>
+         <lastmod>2023-05-09</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/saleor/saleor-app-framework-python/event_handlers/http/</loc>
+         <lastmod>2023-05-09</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/saleor/saleor-app-framework-python/event_handlers/sqs/</loc>
+         <lastmod>2023-05-09</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/saleor/saleor-app-framework-python/local_app_development/</loc>
+         <lastmod>2023-05-09</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>
